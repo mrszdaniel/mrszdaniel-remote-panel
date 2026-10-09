@@ -1,1 +1,603 @@
-Hello from my phone panel
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ticket hunter">
+<meta name="theme-color" content="#dc052d">
+<meta name="referrer" content="no-referrer">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Ticket hunter</title>
+<style>
+:root {
+  --red: #dc052d; --red-dark: #b80426;
+  --bg: #f4f4f6; --card: #ffffff; --soft: #f6f6f8; --line: #e6e6ea;
+  --ink: #1d1d1f; --muted: #6b6b72; --faint: #8a8a90;
+  --ok: #137333; --warn: #9a5b00; --bad: #c5221f; --link: #0066b2;
+  --warn-bg: #fff4e5; --bad-bg: #fdecea; --ok-bg: #e7f4ea;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111113; --card: #1c1c1f; --soft: #26262a; --line: #303035;
+    --ink: #f1f1f3; --muted: #a3a3ab; --faint: #7d7d85;
+    --ok: #6fcf8c; --warn: #f0b45a; --bad: #ff7b72; --link: #6cb6ff;
+    --warn-bg: #3a2d16; --bad-bg: #3d1d1b; --ok-bg: #173322;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; -webkit-text-size-adjust: 100%; }
+body { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+.head { position: sticky; top: 0; z-index: 5; background: var(--red); color: #fff;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; display: flex; align-items: center; gap: 10px; }
+.head .name { flex: 1; font-weight: 600; font-size: 18px; }
+.pill { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #fff; color: #555; white-space: nowrap; }
+.pill .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 6px; vertical-align: 1px; }
+.pill.on { color: #137333; } .pill.on .dot { animation: beat 1.6s ease-in-out infinite; }
+.pill.off { color: #c5221f; } .pill.wait { color: #9a5b00; }
+@keyframes beat { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .pill.on .dot { animation: none; } }
+.lang { all: unset; cursor: pointer; font-size: 13px; font-weight: 600; border: 1px solid rgba(255,255,255,.6); border-radius: 7px; padding: 3px 8px; }
+.ctx { background: var(--card); border-bottom: 1px solid var(--line); padding: 10px 14px; display: grid;
+  grid-template-columns: auto minmax(0, 1fr); gap: 8px 10px; align-items: center; }
+.ctx .lbl { color: var(--muted); font-size: 14px; }
+select, input[type=text], input[type=number] { width: 100%; font: inherit; font-size: 16px; padding: 9px 10px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.note { grid-column: 1 / -1; font-size: 13px; color: var(--warn); }
+main { padding: 12px 12px 0; display: grid; gap: 12px; max-width: 560px; margin: 0 auto; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.card h2 { font-size: 13px; font-weight: 600; letter-spacing: .02em; color: var(--muted); margin: 0 0 8px; text-transform: none; }
+.big { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.big .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex: none; }
+.big.hunting .dot { background: var(--ok); } .big.paused .dot { background: var(--warn); }
+.big.clicking .dot { background: var(--red); } .big.away .dot { background: var(--link); }
+.sub { color: var(--muted); font-size: 14px; margin-top: 2px; }
+.rows { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 6px; }
+.row { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 15px; }
+.row .k { color: var(--muted); } .row .v { text-align: right; font-variant-numeric: tabular-nums; min-width: 0; overflow-wrap: anywhere; }
+.banner { border-radius: 10px; padding: 10px 12px; font-size: 14px; margin-top: 10px; }
+.banner.bad { background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+.banner.warn { background: var(--warn-bg); color: var(--warn); }
+.item { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--soft);
+  border-radius: 10px; padding: 9px 10px; margin-top: 6px; font-size: 15px; }
+.item .p { color: var(--muted); }
+.btns { display: flex; gap: 10px; margin-top: 12px; }
+button { font: inherit; font-size: 16px; cursor: pointer; flex: 1; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--card); color: var(--ink); -webkit-tap-highlight-color: transparent; }
+button:active { transform: scale(.98); }
+button.primary { background: var(--red); border-color: var(--red); color: #fff; }
+button.danger { color: var(--bad); }
+button.sure { background: var(--bad); border-color: var(--bad); color: #fff; }
+button.small { flex: none; padding: 6px 12px; font-size: 14px; border-radius: 9px; }
+button:disabled { opacity: .5; }
+.ev { font-size: 14px; color: var(--muted); padding: 3px 0; display: flex; gap: 8px; }
+.ev time { color: var(--faint); font-variant-numeric: tabular-nums; flex: none; }
+label { display: block; margin-top: 12px; color: var(--muted); font-size: 14px; }
+label > input, label > select { margin-top: 5px; }
+.check { display: flex; align-items: center; gap: 10px; color: var(--ink); font-size: 16px; }
+.check input { width: 22px; height: 22px; accent-color: var(--red); }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hint { font-size: 13px; color: var(--faint); margin-top: 4px; }
+.err { font-size: 13px; color: var(--bad); margin-top: 4px; }
+.confirm { background: var(--warn-bg); color: var(--warn); padding: 12px 14px; font-size: 15px; border-bottom: 1px solid var(--line); }
+.toast { position: fixed; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 10;
+  background: #1d1d1f; color: #fff; border-radius: 12px; padding: 12px 14px; font-size: 15px; text-align: center;
+  box-shadow: 0 6px 24px rgba(0,0,0,.25); max-width: 536px; margin: 0 auto; }
+.toast.bad { background: var(--bad); }
+.foot { text-align: center; font-size: 13px; color: var(--faint); padding: 4px 0 8px; }
+.foot button { all: unset; color: var(--link); cursor: pointer; margin-left: 6px; }
+.intro { text-align: center; padding: 40px 18px; color: var(--muted); }
+.intro b { color: var(--ink); display: block; font-size: 20px; margin-bottom: 8px; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="head">
+  <span class="name" id="title">Ticket hunter</span>
+  <span class="pill wait" id="online"><span class="dot"></span><span id="onlineText">…</span></span>
+  <button class="lang" id="lang" type="button"></button>
+</div>
+
+<!-- not paired -->
+<div class="intro hidden" id="unpaired"><b id="upTitle"></b><span id="upText"></span>
+  <label style="text-align:left;margin-top:22px"><span id="lPaste"></span><input type="text" id="paste" autocapitalize="off" autocomplete="off" autocorrect="off"></label>
+  <div class="err hidden" id="ePaste" style="text-align:left"></div>
+  <div class="btns"><button class="primary" id="pairBtn" type="button"></button></div>
+</div>
+<div class="banner warn hidden" id="installTip" style="margin:12px 12px 0;border-radius:12px"></div>
+
+<!-- paired -->
+<div id="app" class="hidden">
+  <div class="ctx">
+    <span class="lbl" id="lAccount"></span><select id="acc"></select>
+    <span class="lbl" id="lMatch"></span><select id="match"></select>
+    <span class="note hidden" id="matchNote"></span>
+  </div>
+  <div class="confirm hidden" id="confirm"><div id="confirmText"></div>
+    <div class="btns"><button class="primary" id="cYes" type="button"></button><button id="cNo" type="button"></button></div>
+  </div>
+
+  <main id="mainView">
+    <section class="card">
+      <h2 id="hStatus"></h2>
+      <div class="big" id="state"><span class="dot"></span><span id="stateText"></span></div>
+      <div class="sub" id="navMsg"></div>
+      <div class="banner bad hidden" id="stuck"></div>
+      <div class="rows">
+        <div class="row"><span class="k" id="kMode"></span><span class="v" id="vMode"></span></div>
+        <div class="row"><span class="k" id="kPage"></span><span class="v" id="vPage"></span></div>
+        <div class="row"><span class="k" id="kLast"></span><span class="v" id="vLast"></span></div>
+        <div class="row"><span class="k" id="kNext"></span><span class="v" id="vNext"></span></div>
+        <div class="row"><span class="k" id="kListed"></span><span class="v" id="vListed"></span></div>
+        <div class="row"><span class="k" id="kChecks"></span><span class="v" id="vChecks"></span></div>
+      </div>
+      <div class="btns"><button id="toggle" type="button"></button><button id="openSettings" type="button"></button></div>
+    </section>
+
+    <section class="card">
+      <h2 id="hCart"></h2>
+      <div class="banner warn hidden" id="cartTask"></div>
+      <div id="items"></div>
+      <div class="btns" id="cartBtns"><button class="danger" id="removeAll" type="button"></button><button class="primary" id="checkout" type="button"></button></div>
+      <div class="btns"><button id="hunt" type="button"></button></div>
+      <div class="row hidden" id="skipRow" style="align-items:center;margin-top:8px"><span class="k" id="skipText"></span><button class="small" id="skipClear" type="button"></button></div>
+    </section>
+
+    <section class="card" id="recentCard">
+      <h2 id="hRecent"></h2>
+      <div id="events"></div>
+    </section>
+  </main>
+
+  <main id="settingsView" class="hidden">
+    <section class="card">
+      <h2 id="hSettings"></h2>
+      <label><span id="lfMode"></span><select id="fMode"></select></label>
+      <div id="wPrice"><label><span id="lfPrice"></span><input type="text" inputmode="decimal" id="fPrice"></label><div class="err hidden" id="ePrice"></div></div>
+      <div id="wBlocks"><label><span id="lfBlocks"></span><input type="text" id="fBlocks" autocapitalize="off" autocomplete="off"></label><div class="hint" id="hfBlocks"></div><div class="err hidden" id="eBlocks"></div></div>
+      <div id="wSeats"><label><span id="lfSeats"></span><input type="number" inputmode="numeric" min="2" step="1" id="fSeats"></label><div class="err hidden" id="eSeats"></div></div>
+      <div class="pair">
+        <label><span id="lfRefresh"></span><input type="text" inputmode="decimal" id="fRefresh"></label>
+        <label><span id="lfJitter"></span><input type="text" inputmode="decimal" id="fJitter"></label>
+      </div>
+      <div class="err hidden" id="eRefresh"></div><div class="err hidden" id="eJitter"></div>
+      <div class="hint" id="hfRefresh"></div>
+      <label class="check"><input type="checkbox" id="fSound"><span id="lfSound"></span></label>
+      <label class="check"><input type="checkbox" id="fNtfy"><span id="lfNtfy"></span></label>
+      <label class="check"><input type="checkbox" id="fDesktop"><span id="lfDesktop"></span></label>
+      <label class="check"><input type="checkbox" id="fStuck"><span id="lfStuck"></span></label>
+      <label><span id="lfStuckMin"></span><input type="number" inputmode="numeric" min="1" step="1" id="fStuckMin"></label>
+      <div class="err hidden" id="eStuckMin"></div>
+      <div class="btns"><button class="primary" id="save" type="button"></button><button id="cancel" type="button"></button></div>
+    </section>
+  </main>
+
+  <div class="foot"><span id="updated"></span><button id="unpair" type="button"></button></div>
+</div>
+<div class="toast hidden" id="toast"></div>
+
+<script>
+(() => {
+'use strict';
+const DB_URL = 'https://remote-panel-c2375-default-rtdb.europe-west1.firebasedatabase.app';
+const ONLINE_MS = 40000;          // the computer reports at least every 15 s while this page is open
+
+// ================= texts =================
+const STR = {
+  en: {
+    lang: 'HU', online: 'Online', offline: 'Offline', connecting: 'Connecting',
+    upTitle: 'Not paired yet', upText: 'On the computer, open the panel, tap 📱 Phone, and scan the code with the iPhone camera.',
+    account: 'Account', match: 'Match', matchTop: 'Top of the list', matchText: '"{t}" (set by text)', thisPage: 'The ticket list shows: {t}',
+    status: 'Status', cart: 'Cart', recent: 'Recent', settings: 'Settings',
+    stHunting: 'Hunting', stPaused: 'Paused', stClicking: 'Clicking', stStarting: 'Starting', stAway: 'Not on the ticket list',
+    mode: 'Mode', page: 'Page', lastCheck: 'Last check', nextRefresh: 'Next refresh', listed: 'On the list', checksToday: 'Checks today',
+    listedValue: '{n} tickets, {m} match', listedNone: 'No tickets', inS: 'in {s} s', dash: '–',
+    pages: { tickets: 'Ticket list', cart: 'Cart', 'EventList.aspx': 'Match list', 'id.fcbayern.com': 'FC Bayern login' },
+    pause: 'Pause', resume: 'Resume',
+    cartCount: '{n} position(s)', cartEmpty: 'Empty', remove: 'Remove', sure: 'Sure?', removeAll: 'Remove all', removeAllSure: 'Remove all?',
+    checkout: 'Checkout', hunt: 'Back to hunting', skipping: 'Not clicking {n} removed ticket(s)', allow: 'Allow again',
+    taskRemove: 'Removing {t}…', taskRemoveAll: 'Removing all tickets…',
+    stuck: 'Hunting seems stuck since {t}.',
+    switchConfirm: 'Switch to {to}? The computer logs out of {from} and logs in as {to}.',
+    switchCart: 'The {n} ticket(s) in {from}\'s cart stay with {from}.', switchYes: 'Switch account', cancel: 'Cancel',
+    fMode: 'What to click', fPrice: 'Price (€)', fBlocks: 'Blocks', fBlocksHint: 'For example 245, or 109-117, 120-123',
+    fSeats: 'Seats next to each other', fRefresh: 'Refresh (s)', fJitter: 'Variation ± (s)',
+    fRefreshHint: 'For example 4 ± 1 refreshes every 3 to 5 seconds. Faster refreshing is more noticeable to the site.',
+    fSound: 'Sound when clicking', fNtfy: 'Phone notifications (ntfy)', fDesktop: 'Desktop notifications',
+    fStuck: 'Alert me if hunting gets stuck', fStuckMin: 'Stuck after (minutes)',
+    errPrice: 'Enter a price, like 19,00', errBlocks: 'Enter at least one block', errSeats: 'Enter 2 or more',
+    errRefresh: 'Enter 1 second or more', errJitter: 'Enter 0 or more, smaller than the refresh time', errStuckMin: 'Enter 1 minute or more',
+    save: 'Save', modes: { top: 'All tickets, from the top', cheapest: 'Cheapest first', price: 'Specific price', adjacent: 'Seats next to each other', blocks: 'Specific block(s)' },
+    sending: 'Sending…', done: 'Done', noAnswer: 'The computer didn\'t answer. Is it on, with an FC Bayern page open?',
+    errs: { errMatch: 'That match isn\'t on the list anymore', errAccount: 'Unknown account', errNotHere: 'Not possible right now: the computer isn\'t logged in on the ticket site',
+            errGone: 'That ticket isn\'t in the cart anymore', errFailed: 'The computer couldn\'t do that', errUnknown: 'The computer doesn\'t know this command yet. Update the script.' },
+    paste: 'Or paste the pairing link here', pairBtn: 'Pair', badLink: 'That isn\'t a pairing link. Copy it from the panel on the computer.',
+    installTip: 'Paired. To use it like an app, tap Share, then "Add to Home Screen" now. The home-screen app will be paired automatically.',
+    updated: 'Updated {t}', never: 'No update yet', unpair: 'Unpair', unpairSure: 'Unpair this phone?',
+    offlineHint: 'The computer isn\'t reporting. Is it on, with an FC Bayern page open?',
+  },
+  hu: {
+    lang: 'EN', online: 'Online', offline: 'Offline', connecting: 'Kapcsolódás',
+    upTitle: 'Még nincs párosítva', upText: 'A számítógépen nyisd meg a panelt, koppints a 📱 Telefon gombra, és olvasd be a kódot az iPhone kamerájával.',
+    account: 'Fiók', match: 'Meccs', matchTop: 'A lista első meccse', matchText: '„{t}” (szövegként megadva)', thisPage: 'A jegylista ezt mutatja: {t}',
+    status: 'Állapot', cart: 'Kosár', recent: 'Legutóbbi események', settings: 'Beállítások',
+    stHunting: 'Keres', stPaused: 'Szünetel', stClicking: 'Kattint', stStarting: 'Indul', stAway: 'Nem a jegylistán van',
+    mode: 'Mód', page: 'Oldal', lastCheck: 'Utolsó ellenőrzés', nextRefresh: 'Következő frissítés', listed: 'A listán', checksToday: 'Mai ellenőrzések',
+    listedValue: '{n} jegy, {m} megfelelő', listedNone: 'Nincs jegy', inS: '{s} mp múlva', dash: '–',
+    pages: { tickets: 'Jegylista', cart: 'Kosár', 'EventList.aspx': 'Meccslista', 'id.fcbayern.com': 'FC Bayern belépés' },
+    pause: 'Szüneteltetés', resume: 'Folytatás',
+    cartCount: '{n} tétel', cartEmpty: 'Üres', remove: 'Törlés', sure: 'Biztos?', removeAll: 'Összes törlése', removeAllSure: 'Mindet törli?',
+    checkout: 'Tovább a fizetéshez', hunt: 'Vissza a kereséshez', skipping: '{n} törölt jegyre nem kattint', allow: 'Újra engedélyez',
+    taskRemove: 'Törlés folyamatban: {t}…', taskRemoveAll: 'Az összes jegy törlése…',
+    stuck: 'A keresés {t} óta elakadtnak tűnik.',
+    switchConfirm: 'Váltás erre: {to}? A gép kijelentkezik ebből: {from}, majd belép ezzel: {to}.',
+    switchCart: '{from} kosarában {n} jegy van, ezek {from} fiókjában maradnak.', switchYes: 'Fiókváltás', cancel: 'Mégse',
+    fMode: 'Mire kattintson', fPrice: 'Ár (€)', fBlocks: 'Szektorok', fBlocksHint: 'Például 245, vagy 109-117, 120-123',
+    fSeats: 'Egymás melletti helyek száma', fRefresh: 'Frissítés (mp)', fJitter: 'Eltérés ± (mp)',
+    fRefreshHint: 'Például 4 ± 1 esetén 3–5 másodpercenként frissít. A gyakoribb frissítés feltűnőbb lehet az oldalnak.',
+    fSound: 'Hangjelzés kattintáskor', fNtfy: 'Értesítés telefonra (ntfy)', fDesktop: 'Asztali értesítés',
+    fStuck: 'Riasztás, ha a keresés elakad', fStuckMin: 'Elakadás ennyi perc után',
+    errPrice: 'Adj meg egy árat, például 19,00', errBlocks: 'Adj meg legalább egy szektort', errSeats: 'Legalább 2-t adj meg',
+    errRefresh: 'Legalább 1 másodpercet adj meg', errJitter: 'Adj meg 0 vagy nagyobb, a frissítési időnél kisebb értéket', errStuckMin: 'Legalább 1 percet adj meg',
+    save: 'Mentés', modes: { top: 'Minden jegy, felülről', cheapest: 'Legolcsóbb először', price: 'Adott ár', adjacent: 'Egymás melletti helyek', blocks: 'Adott szektor(ok)' },
+    sending: 'Küldés…', done: 'Kész', noAnswer: 'A gép nem válaszolt. Be van kapcsolva, és nyitva van egy FC Bayern oldal?',
+    errs: { errMatch: 'Ez a meccs már nincs a listán', errAccount: 'Ismeretlen fiók', errNotHere: 'Most nem lehet: a gép nincs bejelentkezve a jegyoldalon',
+            errGone: 'Ez a jegy már nincs a kosárban', errFailed: 'A gép ezt nem tudta végrehajtani', errUnknown: 'A gép még nem ismeri ezt a parancsot. Frissítsd a scriptet.' },
+    paste: 'Vagy illeszd be ide a párosító linket', pairBtn: 'Párosítás', badLink: 'Ez nem párosító link. Másold ki a számítógépen a panelből.',
+    installTip: 'Párosítva. Hogy alkalmazásként használd, koppints most a Megosztás, majd a „Főképernyőhöz adás” gombra. A főképernyős alkalmazás magától párosítva lesz.',
+    updated: 'Frissítve: {t}', never: 'Még nincs adat', unpair: 'Párosítás törlése', unpairSure: 'Törlöd a párosítást?',
+    offlineHint: 'A gép nem jelentkezik. Be van kapcsolva, és nyitva van egy FC Bayern oldal?',
+  },
+};
+let lang = localStorage.getItem('rp_lang') || ((navigator.language || '').startsWith('hu') ? 'hu' : 'en');
+let T = STR[lang];
+const fmt = (s, v = {}) => String(s).replace(/\{(\w+)\}/g, (_, k) => (k in v ? v[k] : `{${k}}`));
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const clock = ts => ts ? new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) : T.dash;
+
+// ================= key and encryption (same as the script) =================
+const enc = new TextEncoder(), dec = new TextDecoder();
+const b64u = {
+  to: bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
+  from: s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - s.length % 4) % 4)), c => c.charCodeAt(0)),
+};
+const join = (...parts) => { const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0)); let o = 0; parts.forEach(p => { out.set(p, o); o += p.length; }); return out; };
+
+// Pairing link: ...#pair=<key>. The part after # never leaves the phone.
+// A home-screen app on iPhone has its own storage, separate from Safari's. So in Safari the key stays in
+// the address after pairing: "Add to Home Screen" then carries it into the app, which removes it from view.
+const standalone = navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+let justPaired = false;
+function takeKey(text) {
+  const m = String(text || '').match(/pair=([A-Za-z0-9_-]{40,})/);
+  if (!m) return false;
+  if (localStorage.getItem('rp_key') !== m[1]) { localStorage.setItem('rp_key', m[1]); localStorage.removeItem('rp_state'); }
+  return true;
+}
+(function takePairing() {
+  justPaired = takeKey(location.hash);
+  if (location.hash && (standalone || !justPaired)) history.replaceState(null, '', location.pathname + location.search);
+})();
+
+let ctx = null;
+async function setup() {
+  const raw = localStorage.getItem('rp_key');
+  if (!raw) return null;
+  const bytes = b64u.from(raw);
+  const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', join(bytes, enc.encode('room'))));
+  const room = [...hash].map(b => b.toString(16).padStart(2, '0')).join('');
+  const key = await crypto.subtle.importKey('raw', bytes, 'AES-GCM', false, ['encrypt', 'decrypt']);
+  ctx = { room, key, base: `${DB_URL}/r/${room}` };
+  return ctx;
+}
+async function seal(obj, kind) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: enc.encode(ctx.room + ':' + kind) }, ctx.key, enc.encode(JSON.stringify(obj))));
+  return b64u.to(join(new Uint8Array([2]), iv, ct));
+}
+async function unseal(str, kind) {
+  const bytes = b64u.from(String(str));
+  if (bytes[0] !== 2) throw new Error('format');
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes.slice(1, 13), additionalData: enc.encode(ctx.room + ':' + kind) }, ctx.key, bytes.slice(13));
+  return JSON.parse(dec.decode(pt));
+}
+
+// ================= connection =================
+let st = null, received = 0, offset = 0;   // offset: computer clock minus phone clock (approx.)
+async function onState(sealed) {
+  if (!sealed) return;
+  let s;
+  try { s = await unseal(sealed, 's'); } catch (e) { return; }   // not from the paired computer: ignore
+  if (st && s.t < st.t) return;
+  st = s; received = Date.now(); offset = s.t - received;
+  try { localStorage.setItem('rp_state', JSON.stringify(s)); } catch (e) { /* full */ }
+  checkAcks();
+  render();
+}
+
+let es = null, lastEvent = 0;
+function listen() {
+  if (es) es.close();
+  es = new EventSource(`${ctx.base}/s.json`);
+  const handle = e => {
+    lastEvent = Date.now();
+    let m; try { m = JSON.parse(e.data); } catch (_) { return; }
+    if (m && m.path === '/' && typeof m.data === 'string') onState(m.data);
+  };
+  es.addEventListener('put', handle);
+  es.addEventListener('patch', handle);
+  es.addEventListener('keep-alive', () => { lastEvent = Date.now(); });
+}
+async function fetchState() {
+  try { const r = await fetch(`${ctx.base}/s.json`, { cache: 'no-store' }); if (r.ok) onState(await r.json()); } catch (e) { /* offline */ }
+}
+// "I'm open": the computer then reports changes right away
+async function hello() {
+  if (document.visibilityState !== 'visible') return;
+  try { await fetch(`${ctx.base}/in/w.json`, { method: 'PUT', body: JSON.stringify(Date.now()) }); } catch (e) { /* offline */ }
+}
+
+// ================= commands =================
+const pending = {};
+async function send(a, p, opts = {}) {
+  const id = b64u.to(crypto.getRandomValues(new Uint8Array(9)));
+  pending[id] = { at: Date.now(), quiet: !!opts.quiet };
+  if (!opts.quiet) toast(T.sending);
+  try {
+    const sealed = await seal({ id, a, p: p || {}, t: Date.now() + offset }, 'c');
+    const r = await fetch(`${ctx.base}/in/c.json`, { method: 'POST', body: JSON.stringify(sealed) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+  } catch (e) { delete pending[id]; toast(T.noAnswer, true); return; }
+  setTimeout(() => { if (pending[id]) { delete pending[id]; toast(T.noAnswer, true); } }, 30000);
+}
+function checkAcks() {
+  for (const a of (st && st.acks) || []) {
+    const p = pending[a.id];
+    if (!p) continue;
+    delete pending[a.id];
+    if (a.ok) { if (!p.quiet) toast(T.done); }
+    else toast(T.errs[a.err] || T.errs.errFailed, true);
+  }
+}
+let toastTimer = null;
+function toast(text, bad) {
+  const t = $('toast');
+  t.textContent = text; t.className = 'toast' + (bad ? ' bad' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add('hidden'), bad ? 5000 : 1800);
+}
+
+// two taps for anything that removes or switches
+let armed = null, armTimer = null;
+function confirmTap(btn, id, sureText, act) {
+  if (armed === id) { armed = null; act(); render(); return; }
+  armed = id; btn.textContent = sureText; btn.classList.add('sure');
+  clearTimeout(armTimer); armTimer = setTimeout(() => { armed = null; render(); }, 4000);
+}
+
+// ================= rendering =================
+const shortName = n => String(n).replace(/^FC Bayern München\s*-\s*/i, 'FCB – ');
+const shortDate = d => { const m = String(d).match(/^(\w{3})\w*,\s*(\w{3})\w*\s+(\d+),\s*\d{4}$/); return m ? `${m[1]} ${m[3]} ${m[2]}` : d; };
+function modeSummary(h) {
+  const name = T.modes[h.mode] || h.mode;
+  if (h.mode === 'price') return `${name}: ${h.price} €`;
+  if (h.mode === 'blocks') return `${name}: ${h.blocks}`;
+  if (h.mode === 'adjacent') return `${name}: ${h.seats}`;
+  return name;
+}
+
+function staticTexts() {
+  document.documentElement.lang = lang;
+  $('lang').textContent = T.lang;
+  $('upTitle').textContent = T.upTitle; $('upText').textContent = T.upText;
+  $('lPaste').textContent = T.paste; $('pairBtn').textContent = T.pairBtn; $('ePaste').textContent = T.badLink; $('installTip').textContent = T.installTip;
+  $('lAccount').textContent = T.account; $('lMatch').textContent = T.match;
+  $('hStatus').textContent = T.status; $('hCart').textContent = T.cart; $('hRecent').textContent = T.recent; $('hSettings').textContent = T.settings;
+  $('kMode').textContent = T.mode; $('kPage').textContent = T.page; $('kLast').textContent = T.lastCheck;
+  $('kNext').textContent = T.nextRefresh; $('kListed').textContent = T.listed; $('kChecks').textContent = T.checksToday;
+  $('openSettings').textContent = T.settings; $('checkout').textContent = T.checkout; $('hunt').textContent = T.hunt;
+  $('skipClear').textContent = T.allow; $('cYes').textContent = T.switchYes; $('cNo').textContent = T.cancel;
+  $('lfMode').textContent = T.fMode; $('lfPrice').textContent = T.fPrice; $('lfBlocks').textContent = T.fBlocks; $('hfBlocks').textContent = T.fBlocksHint;
+  $('lfSeats').textContent = T.fSeats; $('lfRefresh').textContent = T.fRefresh; $('lfJitter').textContent = T.fJitter; $('hfRefresh').textContent = T.fRefreshHint;
+  $('lfSound').textContent = T.fSound; $('lfNtfy').textContent = T.fNtfy; $('lfDesktop').textContent = T.fDesktop;
+  $('lfStuck').textContent = T.fStuck; $('lfStuckMin').textContent = T.fStuckMin;
+  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin'].forEach(k => { $('e' + k).textContent = T['err' + k]; });
+  $('save').textContent = T.save; $('cancel').textContent = T.cancel;
+  const cur = $('fMode').value;
+  $('fMode').innerHTML = Object.entries(T.modes).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
+  if (cur) $('fMode').value = cur;
+}
+
+function render() {
+  const paired = !!ctx;
+  $('unpaired').classList.toggle('hidden', paired);
+  $('installTip').classList.toggle('hidden', !(paired && justPaired && !standalone));
+  $('app').classList.toggle('hidden', !paired);
+  const online = st && (Date.now() + offset - st.t) < ONLINE_MS;
+  $('online').className = 'pill ' + (!st ? 'wait' : online ? 'on' : 'off');
+  $('onlineText').textContent = !st ? T.connecting : online ? T.online : T.offline;
+  if (!paired) return;
+  $('updated').textContent = st ? fmt(T.updated, { t: clock(received) }) : T.never;
+  if (armed !== 'unpair') $('unpair').textContent = T.unpair;
+  if (!st) return;
+
+  // account
+  const accSig = st.accounts.join('|') + '#' + st.account;
+  if ($('acc').dataset.sig !== accSig && $('confirm').classList.contains('hidden')) {
+    $('acc').innerHTML = st.accounts.map(n => `<option${n === st.account ? ' selected' : ''}>${esc(n)}</option>`).join('');
+    $('acc').dataset.sig = accSig;
+  }
+  // match
+  const items = st.matches || [];
+  const known = items.some(i => i.key === st.match.key);
+  const mSig = items.map(i => i.key).join('|') + '#' + st.match.key + '#' + st.match.text + '#' + lang;
+  if ($('match').dataset.sig !== mSig) {
+    $('match').innerHTML = [`<option value="">${esc(T.matchTop)}</option>`]
+      .concat(items.map(i => `<option value="${esc(i.key)}"${i.key === st.match.key ? ' selected' : ''}>${esc(shortName(i.name))} · ${esc(shortDate(i.date))}</option>`))
+      .concat(!known && st.match.text ? [`<option value="__text" selected>${esc(fmt(T.matchText, { t: st.match.text }))}</option>`] : []).join('');
+    $('match').dataset.sig = mSig;
+  }
+  const wanted = (items.find(i => i.key === st.match.key) || {}).name || st.match.text;
+  const differs = st.match.open && wanted && st.match.open.toLowerCase() !== wanted.toLowerCase();
+  $('matchNote').classList.toggle('hidden', !differs);
+  if (differs) $('matchNote').textContent = fmt(T.thisPage, { t: st.match.open });
+
+  // status
+  const h = st.hunt;
+  const status = st.paused ? 'paused' : h.status;
+  $('state').className = 'big ' + status;
+  $('stateText').textContent = { hunting: T.stHunting, paused: T.stPaused, clicking: T.stClicking, starting: T.stStarting, away: T.stAway }[status] || status;
+  $('navMsg').textContent = st.page === 'tickets' ? '' : ((st.nav.msg || {})[lang] || '');
+  $('stuck').classList.toggle('hidden', !st.nav.stuck);
+  if (st.nav.stuck) $('stuck').textContent = fmt(T.stuck, { t: clock(st.nav.stuck.since - offset) });
+  if (!online) { $('navMsg').textContent = T.offlineHint; }
+  $('vMode').textContent = modeSummary(h);
+  $('vPage').textContent = T.pages[st.page] || st.page;
+  $('vLast').textContent = clock(h.lastCheck ? h.lastCheck - offset : 0);
+  $('vListed').textContent = h.listed == null ? T.dash : h.listed === 0 ? T.listedNone : fmt(T.listedValue, { n: h.listed, m: h.matching });
+  $('vChecks').textContent = h.checksToday;
+  $('toggle').textContent = st.paused ? T.resume : T.pause;
+  $('toggle').className = st.paused ? 'primary' : '';
+  tick();
+
+  // cart
+  const c = st.cart;
+  $('hCart').textContent = `${T.cart}: ${c.count ? fmt(T.cartCount, { n: c.count }) : T.cartEmpty}`;
+  $('cartTask').classList.toggle('hidden', !c.task);
+  if (c.task) $('cartTask').textContent = c.task.action === 'remove' ? fmt(T.taskRemove, { t: c.task.label }) : T.taskRemoveAll;
+  $('items').innerHTML = (c.count ? c.items : []).map(i => {
+    const sure = armed === 'rm:' + i.key;
+    return `<div class="item"><span>${esc(i.seatInfo)} <span class="p">· ${esc(i.price)}</span></span>
+      <button class="small danger${sure ? ' sure' : ''}" data-key="${esc(i.key)}" type="button">${sure ? T.sure : T.remove}</button></div>`;
+  }).join('');
+  $('items').querySelectorAll('[data-key]').forEach(b => {
+    b.onclick = () => confirmTap(b, 'rm:' + b.dataset.key, T.sure, () => send('remove', { key: b.dataset.key }));
+  });
+  $('cartBtns').classList.toggle('hidden', !c.count);
+  if (armed !== 'all') { $('removeAll').textContent = T.removeAll; $('removeAll').classList.remove('sure'); }
+  $('skipRow').classList.toggle('hidden', !c.skipped);
+  $('skipText').textContent = fmt(T.skipping, { n: c.skipped });
+
+  // recent
+  $('recentCard').classList.toggle('hidden', !(st.events || []).length);
+  $('events').innerHTML = (st.events || []).map(e => `<div class="ev"><time>${clock(e.at - offset)}</time><span>${esc(e[lang] || e.en)}</span></div>`).join('');
+}
+
+function tick() {
+  if (!st) return;
+  const next = st.hunt.nextReloadAt;
+  if (!next || st.paused) { $('vNext').textContent = T.dash; return; }
+  const s = Math.max(0, (next - (Date.now() + offset)) / 1000);
+  $('vNext').textContent = fmt(T.inS, { s: s.toFixed(1).replace('.', lang === 'hu' ? ',' : '.') });
+}
+
+// ================= settings form =================
+const parseNum = v => { const n = parseFloat(String(v).trim().replace(',', '.')); return isNaN(n) ? null : n; };
+const showNum = n => String(+Number(n).toFixed(2)).replace('.', lang === 'hu' ? ',' : '.');
+function showModeFields() {
+  const m = $('fMode').value;
+  $('wPrice').classList.toggle('hidden', m !== 'price');
+  $('wBlocks').classList.toggle('hidden', m !== 'blocks');
+  $('wSeats').classList.toggle('hidden', m !== 'adjacent');
+}
+function openSettings() {
+  if (!st) return;
+  const h = st.hunt, n = st.notify;
+  $('fMode').value = h.mode; $('fPrice').value = h.price; $('fBlocks').value = h.blocks; $('fSeats').value = h.seats;
+  $('fRefresh').value = showNum(h.refresh); $('fJitter').value = showNum(h.jitter);
+  $('fSound').checked = h.sound; $('fNtfy').checked = n.ntfy; $('fDesktop').checked = n.desktop;
+  $('fStuck').checked = n.stuck; $('fStuckMin').value = n.stuckMin;
+  document.querySelectorAll('.err').forEach(e => e.classList.add('hidden'));
+  showModeFields();
+  $('mainView').classList.add('hidden'); $('settingsView').classList.remove('hidden');
+  window.scrollTo(0, 0);
+}
+function closeSettings() { $('settingsView').classList.add('hidden'); $('mainView').classList.remove('hidden'); }
+function saveSettings() {
+  const mode = $('fMode').value, refresh = parseNum($('fRefresh').value), jitter = parseNum($('fJitter').value);
+  const seats = parseInt($('fSeats').value, 10), stuckMin = parseNum($('fStuckMin').value);
+  const errors = {
+    Price: mode === 'price' && parseNum(String($('fPrice').value).replace(/[^\d,.]/g, '')) === null,
+    Blocks: mode === 'blocks' && !$('fBlocks').value.trim(),
+    Seats: mode === 'adjacent' && !(seats >= 2),
+    Refresh: refresh === null || refresh < 1,
+    Jitter: jitter === null || jitter < 0 || (refresh !== null && jitter >= refresh),
+    StuckMin: $('fStuck').checked && !(stuckMin >= 1),
+  };
+  let first = null;
+  for (const [k, bad] of Object.entries(errors)) { $('e' + k).classList.toggle('hidden', !bad); if (bad && !first) first = $('f' + k); }
+  if (first) { first.focus(); return; }
+  const p = { mode, refresh, jitter, sound: $('fSound').checked, ntfy: $('fNtfy').checked, desktop: $('fDesktop').checked, stuck: $('fStuck').checked };
+  if (mode === 'price') p.price = $('fPrice').value.trim();
+  if (mode === 'blocks') p.blocks = $('fBlocks').value.trim();
+  if (mode === 'adjacent') p.seats = seats;
+  if (stuckMin >= 1) p.stuckMin = stuckMin;
+  send('set', p);
+  closeSettings();
+}
+
+// ================= wiring =================
+function wire() {
+  $('lang').onclick = () => { lang = lang === 'en' ? 'hu' : 'en'; T = STR[lang]; localStorage.setItem('rp_lang', lang); staticTexts(); $('match').dataset.sig = ''; render(); };
+  $('pairBtn').onclick = async () => {
+    if (!takeKey($('paste').value)) { $('ePaste').classList.remove('hidden'); return; }
+    $('paste').value = ''; await setup(); render(); listen(); fetchState(); hello();
+  };
+  $('paste').oninput = () => $('ePaste').classList.add('hidden');
+  $('toggle').onclick = () => send(st && st.paused ? 'resume' : 'pause');
+  $('openSettings').onclick = openSettings;
+  $('cancel').onclick = closeSettings;
+  $('save').onclick = saveSettings;
+  $('fMode').onchange = showModeFields;
+  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin'].forEach(k => { $('f' + k).oninput = () => $('e' + k).classList.add('hidden'); });
+  $('match').onchange = () => { const v = $('match').value; if (v !== '__text') send('match', { key: v }); };
+  $('acc').onchange = () => {
+    const to = $('acc').value;
+    if (!st || to === st.account) return;
+    const cart = st.cart.count || 0;
+    $('confirmText').textContent = fmt(T.switchConfirm, { from: st.account || '?', to }) + (cart > 0 ? ' ' + fmt(T.switchCart, { n: cart, from: st.account || '?' }) : '');
+    $('confirm').classList.remove('hidden');
+    $('cYes').onclick = () => { $('confirm').classList.add('hidden'); send('account', { name: to }); };
+    $('cNo').onclick = () => { $('confirm').classList.add('hidden'); $('acc').value = st.account; };
+  };
+  $('removeAll').onclick = () => confirmTap($('removeAll'), 'all', T.removeAllSure, () => send('removeAll'));
+  $('checkout').onclick = () => send('checkout');
+  $('hunt').onclick = () => send('hunt');
+  $('skipClear').onclick = () => send('skipClear');
+  $('unpair').onclick = () => confirmTap($('unpair'), 'unpair', T.unpairSure, () => {
+    localStorage.removeItem('rp_key'); localStorage.removeItem('rp_state'); if (es) es.close(); ctx = null; st = null; justPaired = false;
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search); render();
+  });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && ctx) { hello(); fetchState(); } });
+}
+
+async function main() {
+  staticTexts();
+  wire();
+  if (!window.crypto || !crypto.subtle) { $('upText').textContent = 'This browser can\'t encrypt. Open the page in Safari.'; render(); return; }
+  if (!await setup()) { render(); startTimers(); return; }
+  try { const saved = JSON.parse(localStorage.getItem('rp_state') || 'null'); if (saved) { st = saved; received = 0; } } catch (e) { /* none */ }
+  render();
+  listen();
+  fetchState();
+  hello();
+  startTimers();
+}
+let timersOn = false;
+function startTimers() {
+  if (timersOn) return;
+  timersOn = true;
+  setInterval(hello, 15000);
+  setInterval(() => { if (Date.now() - lastEvent > 45000) { fetchState(); listen(); } }, 20000);   // reconnect if the live link went quiet
+  setInterval(() => { tick(); render(); }, 1000);
+}
+main();
+})();
+</script>
+</body>
+</html>
