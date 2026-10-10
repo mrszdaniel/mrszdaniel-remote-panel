@@ -54,7 +54,7 @@ main { padding: 12px 12px 0; display: grid; gap: 12px; max-width: 560px; margin:
 .big { font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .big .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex: none; }
 .big.hunting .dot { background: var(--ok); } .big.paused .dot { background: var(--warn); }
-.big.clicking .dot { background: var(--red); } .big.away .dot { background: var(--link); }
+.big.clicking .dot { background: var(--red); } .big.hold .dot { background: var(--warn); } .big.away .dot { background: var(--link); }
 .sub { color: var(--muted); font-size: 14px; margin-top: 2px; }
 .rows { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 6px; }
 .row { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; font-size: 15px; }
@@ -92,6 +92,17 @@ label > input, label > select { margin-top: 5px; }
 .foot button { all: unset; color: var(--link); cursor: pointer; margin-left: 6px; }
 .intro { text-align: center; padding: 40px 18px; color: var(--muted); }
 .intro b { color: var(--ink); display: block; font-size: 20px; margin-bottom: 8px; }
+/* seat map */
+.seatmap { margin: 10px -4px 4px; }
+.seatmap svg { display: block; width: 100%; height: auto; }
+.seatmap .blk { stroke: var(--card); stroke-width: 1.5; }
+.seatmap .num { fill: var(--muted); }
+.seatmap .num.on { fill: #fff; }
+.seatmap .pitchbg { fill: var(--card); }
+.seatmap .lines { fill: none; stroke: var(--line); stroke-width: 1.5; }
+.mapinfo { background: var(--soft); border-radius: 10px; padding: 8px 10px; font-size: 14px; margin-bottom: 4px; }
+#skipList .item { font-size: 14px; }
+#skipList .why { color: var(--muted); }
 .hidden { display: none !important; }
 </style>
 </head>
@@ -141,10 +152,13 @@ label > input, label > select { margin-top: 5px; }
     <section class="card">
       <h2 id="hCart"></h2>
       <div class="banner warn hidden" id="cartTask"></div>
+      <div class="seatmap hidden" id="seatMap"></div>
+      <div class="mapinfo hidden" id="mapInfo"></div>
       <div id="items"></div>
       <div class="btns" id="cartBtns"><button class="danger" id="removeAll" type="button"></button><button class="primary" id="checkout" type="button"></button></div>
       <div class="btns"><button id="hunt" type="button"></button></div>
-      <div class="row hidden" id="skipRow" style="align-items:center;margin-top:8px"><span class="k" id="skipText"></span><button class="small" id="skipClear" type="button"></button></div>
+      <div class="row hidden" id="skipRow" style="align-items:center;margin-top:8px"><span class="k" id="skipText"></span><button class="small" id="skipToggle" type="button"></button></div>
+      <div class="hidden" id="skipList"></div>
     </section>
 
     <section class="card" id="recentCard">
@@ -166,6 +180,12 @@ label > input, label > select { margin-top: 5px; }
       </div>
       <div class="err hidden" id="eRefresh"></div><div class="err hidden" id="eJitter"></div>
       <div class="hint" id="hfRefresh"></div>
+      <div class="pair">
+        <label><span id="lfFail"></span><input type="number" inputmode="numeric" min="0" max="20" step="1" id="fFail"></label>
+        <label><span id="lfFailMin"></span><input type="number" inputmode="numeric" min="1" max="1440" step="1" id="fFailMin"></label>
+      </div>
+      <div class="err hidden" id="eFail"></div><div class="err hidden" id="eFailMin"></div>
+      <div class="hint" id="hfFail"></div>
       <label class="check"><input type="checkbox" id="fSound"><span id="lfSound"></span></label>
       <label class="check"><input type="checkbox" id="fNtfy"><span id="lfNtfy"></span></label>
       <label class="check"><input type="checkbox" id="fDesktop"><span id="lfDesktop"></span></label>
@@ -189,6 +209,13 @@ const ONLINE_MS = 40000;          // the computer reports at least every 15 s wh
 // ================= texts =================
 const STR = {
   en: {
+    stHold: 'On hold',
+    fFail: 'Skip after (failed clicks)', fFailMin: 'for (minutes)',
+    fFailHint: 'A ticket that keeps failing is skipped for a while. Two site error pages also skip it. 0 turns this off.',
+    errFail: 'Enter 0 to 20', errFailMin: 'Enter 1 to 1440 minutes',
+    skipShow: 'Show', skipHide: 'Hide', allowOne: 'Allow', allowAll: 'Allow all',
+    rsRemoved: 'removed by you', rsFailed: 'failed {n}×', rsError: 'site error', rsUntil: 'until {t}',
+    mapTap: 'Tap a highlighted block for its tickets.', mapOff: 'Not on the map: {t}',
     lang: 'HU', online: 'Online', offline: 'Offline', connecting: 'Connecting',
     upTitle: 'Not paired yet', upText: 'On the computer, open the panel, tap 📱 Phone, and scan the code with the iPhone camera.',
     account: 'Account', match: 'Match', matchTop: 'Top of the list', matchText: '"{t}" (set by text)', thisPage: 'The ticket list shows: {t}',
@@ -199,7 +226,7 @@ const STR = {
     pages: { tickets: 'Ticket list', cart: 'Cart', 'EventList.aspx': 'Match list', 'id.fcbayern.com': 'FC Bayern login' },
     pause: 'Pause', resume: 'Resume',
     cartCount: '{n} position(s)', cartEmpty: 'Empty', remove: 'Remove', sure: 'Sure?', removeAll: 'Remove all', removeAllSure: 'Remove all?',
-    checkout: 'Checkout', hunt: 'Back to hunting', skipping: 'Not clicking {n} removed ticket(s)', allow: 'Allow again',
+    checkout: 'Checkout', hunt: 'Back to hunting', skipping: 'Not clicking {n} ticket(s)', allow: 'Allow again',
     taskRemove: 'Removing {t}…', taskRemoveAll: 'Removing all tickets…',
     stuck: 'Hunting seems stuck since {t}.',
     switchConfirm: 'Switch to {to}? The computer logs out of {from} and logs in as {to}.',
@@ -211,7 +238,7 @@ const STR = {
     fStuck: 'Alert me if hunting gets stuck', fStuckMin: 'Stuck after (minutes)',
     errPrice: 'Enter a price, like 19,00', errBlocks: 'Enter at least one block', errSeats: 'Enter 2 or more',
     errRefresh: 'Enter 1 second or more', errJitter: 'Enter 0 or more, smaller than the refresh time', errStuckMin: 'Enter 1 minute or more',
-    save: 'Save', modes: { top: 'All tickets, from the top', cheapest: 'Cheapest first', price: 'Specific price', adjacent: 'Seats next to each other', blocks: 'Specific block(s)' },
+    save: 'Save', modes: { top: 'All tickets, from the top', topOne: 'Only the top ticket', bottomOne: 'Only the bottom ticket', cheapest: 'Cheapest first', price: 'Specific price', adjacent: 'Seats next to each other', blocks: 'Specific block(s)' },
     sending: 'Sending…', done: 'Done', noAnswer: 'The computer didn\'t answer. Is it on, with an FC Bayern page open?',
     errs: { errMatch: 'That match isn\'t on the list anymore', errAccount: 'Unknown account', errNotHere: 'Not possible right now: the computer isn\'t logged in on the ticket site',
             errGone: 'That ticket isn\'t in the cart anymore', errFailed: 'The computer couldn\'t do that', errUnknown: 'The computer doesn\'t know this command yet. Update the script.' },
@@ -221,6 +248,13 @@ const STR = {
     offlineHint: 'The computer isn\'t reporting. Is it on, with an FC Bayern page open?',
   },
   hu: {
+    stHold: 'Várakoztatva',
+    fFail: 'Kihagyás ennyi sikertelen kattintás után', fFailMin: 'ennyi percre',
+    fFailHint: 'Az újra és újra sikertelen jegyet egy időre kihagyja. Két oldalhiba szintén kihagyást okoz. 0 esetén kikapcsolva.',
+    errFail: '0 és 20 között adj meg', errFailMin: '1 és 1440 perc között adj meg',
+    skipShow: 'Mutat', skipHide: 'Elrejt', allowOne: 'Engedélyez', allowAll: 'Mindet engedélyez',
+    rsRemoved: 'te törölted', rsFailed: '{n}× sikertelen', rsError: 'oldalhiba', rsUntil: 'eddig: {t}',
+    mapTap: 'Koppints egy kiemelt szektorra a jegyeihez.', mapOff: 'Nincs a térképen: {t}',
     lang: 'EN', online: 'Online', offline: 'Offline', connecting: 'Kapcsolódás',
     upTitle: 'Még nincs párosítva', upText: 'A számítógépen nyisd meg a panelt, koppints a 📱 Telefon gombra, és olvasd be a kódot az iPhone kamerájával.',
     account: 'Fiók', match: 'Meccs', matchTop: 'A lista első meccse', matchText: '„{t}” (szövegként megadva)', thisPage: 'A jegylista ezt mutatja: {t}',
@@ -231,7 +265,7 @@ const STR = {
     pages: { tickets: 'Jegylista', cart: 'Kosár', 'EventList.aspx': 'Meccslista', 'id.fcbayern.com': 'FC Bayern belépés' },
     pause: 'Szüneteltetés', resume: 'Folytatás',
     cartCount: '{n} tétel', cartEmpty: 'Üres', remove: 'Törlés', sure: 'Biztos?', removeAll: 'Összes törlése', removeAllSure: 'Mindet törli?',
-    checkout: 'Tovább a fizetéshez', hunt: 'Vissza a kereséshez', skipping: '{n} törölt jegyre nem kattint', allow: 'Újra engedélyez',
+    checkout: 'Tovább a fizetéshez', hunt: 'Vissza a kereséshez', skipping: '{n} jegyre nem kattint', allow: 'Újra engedélyez',
     taskRemove: 'Törlés folyamatban: {t}…', taskRemoveAll: 'Az összes jegy törlése…',
     stuck: 'A keresés {t} óta elakadtnak tűnik.',
     switchConfirm: 'Váltás erre: {to}? A gép kijelentkezik ebből: {from}, majd belép ezzel: {to}.',
@@ -243,7 +277,7 @@ const STR = {
     fStuck: 'Riasztás, ha a keresés elakad', fStuckMin: 'Elakadás ennyi perc után',
     errPrice: 'Adj meg egy árat, például 19,00', errBlocks: 'Adj meg legalább egy szektort', errSeats: 'Legalább 2-t adj meg',
     errRefresh: 'Legalább 1 másodpercet adj meg', errJitter: 'Adj meg 0 vagy nagyobb, a frissítési időnél kisebb értéket', errStuckMin: 'Legalább 1 percet adj meg',
-    save: 'Mentés', modes: { top: 'Minden jegy, felülről', cheapest: 'Legolcsóbb először', price: 'Adott ár', adjacent: 'Egymás melletti helyek', blocks: 'Adott szektor(ok)' },
+    save: 'Mentés', modes: { top: 'Minden jegy, felülről', topOne: 'Csak a legfelső jegy', bottomOne: 'Csak a legalsó jegy', cheapest: 'Legolcsóbb először', price: 'Adott ár', adjacent: 'Egymás melletti helyek', blocks: 'Adott szektor(ok)' },
     sending: 'Küldés…', done: 'Kész', noAnswer: 'A gép nem válaszolt. Be van kapcsolva, és nyitva van egy FC Bayern oldal?',
     errs: { errMatch: 'Ez a meccs már nincs a listán', errAccount: 'Ismeretlen fiók', errNotHere: 'Most nem lehet: a gép nincs bejelentkezve a jegyoldalon',
             errGone: 'Ez a jegy már nincs a kosárban', errFailed: 'A gép ezt nem tudta végrehajtani', errUnknown: 'A gép még nem ismeri ezt a parancsot. Frissítsd a scriptet.' },
@@ -400,13 +434,14 @@ function staticTexts() {
   $('hStatus').textContent = T.status; $('hCart').textContent = T.cart; $('hRecent').textContent = T.recent; $('hSettings').textContent = T.settings;
   $('kMode').textContent = T.mode; $('kPage').textContent = T.page; $('kLast').textContent = T.lastCheck;
   $('kNext').textContent = T.nextRefresh; $('kListed').textContent = T.listed; $('kChecks').textContent = T.checksToday;
-  $('openSettings').textContent = T.settings; $('checkout').textContent = T.checkout; $('hunt').textContent = T.hunt;
-  $('skipClear').textContent = T.allow; $('cYes').textContent = T.switchYes; $('cNo').textContent = T.cancel;
+  $('openSettings').textContent = '⚙ ' + T.settings; $('checkout').textContent = T.checkout; $('hunt').textContent = T.hunt;
+ $('cYes').textContent = T.switchYes; $('cNo').textContent = T.cancel;
   $('lfMode').textContent = T.fMode; $('lfPrice').textContent = T.fPrice; $('lfBlocks').textContent = T.fBlocks; $('hfBlocks').textContent = T.fBlocksHint;
   $('lfSeats').textContent = T.fSeats; $('lfRefresh').textContent = T.fRefresh; $('lfJitter').textContent = T.fJitter; $('hfRefresh').textContent = T.fRefreshHint;
   $('lfSound').textContent = T.fSound; $('lfNtfy').textContent = T.fNtfy; $('lfDesktop').textContent = T.fDesktop;
   $('lfStuck').textContent = T.fStuck; $('lfStuckMin').textContent = T.fStuckMin;
-  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin'].forEach(k => { $('e' + k).textContent = T['err' + k]; });
+  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin', 'Fail', 'FailMin'].forEach(k => { $('e' + k).textContent = T['err' + k]; });
+  $('lfFail').textContent = T.fFail; $('lfFailMin').textContent = T.fFailMin; $('hfFail').textContent = T.fFailHint;
   $('save').textContent = T.save; $('cancel').textContent = T.cancel;
   const cur = $('fMode').value;
   $('fMode').innerHTML = Object.entries(T.modes).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
@@ -439,7 +474,7 @@ function render() {
   if ($('match').dataset.sig !== mSig) {
     $('match').innerHTML = [`<option value="">${esc(T.matchTop)}</option>`]
       .concat(items.map(i => `<option value="${esc(i.key)}"${i.key === st.match.key ? ' selected' : ''}>${esc(shortName(i.name))} · ${esc(shortDate(i.date))}</option>`))
-      .concat(!known && st.match.text ? [`<option value="__text" selected>${esc(fmt(T.matchText, { t: st.match.text }))}</option>`] : []).join('');
+      .join('');
     $('match').dataset.sig = mSig;
   }
   const wanted = (items.find(i => i.key === st.match.key) || {}).name || st.match.text;
@@ -449,9 +484,9 @@ function render() {
 
   // status
   const h = st.hunt;
-  const status = st.paused ? 'paused' : h.status;
+  const status = st.paused ? 'paused' : (st.hold ? 'hold' : h.status);
   $('state').className = 'big ' + status;
-  $('stateText').textContent = { hunting: T.stHunting, paused: T.stPaused, clicking: T.stClicking, starting: T.stStarting, away: T.stAway }[status] || status;
+  $('stateText').textContent = { hunting: T.stHunting, paused: T.stPaused, clicking: T.stClicking, starting: T.stStarting, away: T.stAway, hold: T.stHold }[status] || status;
   $('navMsg').textContent = st.page === 'tickets' ? '' : ((st.nav.msg || {})[lang] || '');
   $('stuck').classList.toggle('hidden', !st.nav.stuck);
   if (st.nav.stuck) $('stuck').textContent = fmt(T.stuck, { t: clock(st.nav.stuck.since - offset) });
@@ -461,7 +496,7 @@ function render() {
   $('vLast').textContent = clock(h.lastCheck ? h.lastCheck - offset : 0);
   $('vListed').textContent = h.listed == null ? T.dash : h.listed === 0 ? T.listedNone : fmt(T.listedValue, { n: h.listed, m: h.matching });
   $('vChecks').textContent = h.checksToday;
-  $('toggle').textContent = st.paused ? T.resume : T.pause;
+  $('toggle').textContent = st.paused ? '▶ ' + T.resume : '⏸ ' + T.pause;
   $('toggle').className = st.paused ? 'primary' : '';
   tick();
 
@@ -480,12 +515,217 @@ function render() {
   });
   $('cartBtns').classList.toggle('hidden', !c.count);
   if (armed !== 'all') { $('removeAll').textContent = T.removeAll; $('removeAll').classList.remove('sure'); }
-  $('skipRow').classList.toggle('hidden', !c.skipped);
-  $('skipText').textContent = fmt(T.skipping, { n: c.skipped });
+  renderMap(c.count ? c.items : []);
+  renderSkip(c.skippedList || []);
 
   // recent
   $('recentCard').classList.toggle('hidden', !(st.events || []).length);
   $('events').innerHTML = (st.events || []).map(e => `<div class="ev"><time>${clock(e.at - offset)}</time><span>${esc(e[lang] || e.en)}</span></div>`).join('');
+}
+
+// Allianz Arena: [block, category (1-4, 5 standing, 6 lounge), extra piece of that block, label x, label y, label size, outline]
+const STADIUM = [
+  ['304',1,0,582,60,12,'607,48 557,49 558,114 608,113'],
+  ['303',1,0,634,60,12,'611,48 611,113 660,113 662,49'],
+  ['107',1,0,426,225,14,'447,183 412,184 398,188 406,212 405,217 399,221 399,224 414,253 448,253'],
+  ['106',1,0,476,208,14,'450,183 452,253 502,253 500,182'],
+  ['101',1,0,742,208,12,'719,182 717,197 717,253 767,253 768,183'],
+  ['136',1,0,793,227,14,'771,183 770,253 807,254 823,222 816,218 813,214 820,188 798,183'],
+  ['105',1,1,0,0,0,'505,230 505,252 555,252 555,230'],
+  ['104',1,1,0,0,0,'558,230 559,252 608,252 608,230'],
+  ['103',1,1,0,0,0,'611,230 612,252 660,252 660,230'],
+  ['102',1,1,0,0,0,'664,230 663,252 713,252 714,230'],
+  ['118',1,0,426,600,14,'419,550 400,617 422,621 447,621 448,551'],
+  ['119',1,0,476,576,12,'451,551 450,621 500,622 501,551'],
+  ['120',1,1,0,0,0,'504,551 504,572 554,572 554,551'],
+  ['121',1,0,583,576,12,'558,551 557,622 607,622 608,551'],
+  ['122',1,0,636,576,12,'611,551 610,622 661,622 661,551'],
+  ['123',1,0,689,576,12,'664,551 664,622 714,622 714,551'],
+  ['124',1,0,742,576,12,'717,551 718,622 768,621 767,551'],
+  ['125',1,0,791,597,12,'770,551 771,621 797,621 817,617 800,551'],
+  ['227',1,0,421,654,15,'406,621 392,684 410,687 445,687 447,624 425,624'],
+  ['234',1,0,797,673,12,'812,621 794,624 771,624 773,687 804,687 826,684'],
+  ['228',1,0,472,648,14,'450,624 448,687 494,688 495,625'],
+  ['229',1,0,528,675,14,'499,625 498,688 557,689 558,625'],
+  ['230',1,0,585,675,14,'561,625 561,689 607,689 607,625'],
+  ['231',1,0,635,675,12,'611,625 610,689 657,688 657,625'],
+  ['232',1,0,690,655,14,'660,625 661,688 720,688 720,625'],
+  ['233',1,0,746,675,12,'768,624 723,625 724,688 770,687'],
+  ['328',1,0,636,724,14,'661,691 610,692 611,757 662,756'],
+  ['327',1,0,584,745,12,'557,692 556,756 577,758 608,757 607,692'],
+  ['305',2,0,528,64,12,'553,49 502,53 503,114 555,114'],
+  ['302',2,0,690,81,14,'665,49 664,113 715,113 716,53'],
+  ['306',2,0,474,68,12,'499,53 448,59 449,114 500,114'],
+  ['301',2,0,744,85,14,'719,53 718,114 769,114 770,59'],
+  ['307',2,0,421,89,14,'445,60 392,68 400,117 421,114 446,114'],
+  ['348',2,0,796,76,14,'774,60 772,114 815,117 823,68 796,62'],
+  ['214',2,0,415,141,14,'396,122 404,183 433,180 432,128 416,123'],
+  ['247',2,0,803,141,14,'823,123 796,125 787,128 786,180 814,183'],
+  ['226',2,0,367,659,14,'372,607 335,661 356,673 380,682 389,683 402,620 391,617'],
+  ['235',2,0,853,661,14,'846,608 831,616 815,621 829,683 854,677 882,662'],
+  ['324',2,0,423,713,14,'403,689 396,738 445,746 446,690'],
+  ['331',2,0,798,728,14,'815,688 804,690 772,690 773,746 823,738'],
+  ['325',2,0,475,736,12,'449,691 449,746 470,750 499,752 500,691'],
+  ['326',2,0,528,722,14,'503,691 502,752 519,755 553,756 554,692'],
+  ['329',2,0,693,741,14,'665,691 665,756 716,753 715,691'],
+  ['330',2,0,746,736,14,'769,690 719,691 719,752 750,750 770,746'],
+  ['215',3,0,368,144,14,'393,122 379,123 367,127 333,145 370,199 388,188 401,184'],
+  ['246',3,0,851,144,14,'826,123 817,184 831,188 849,199 886,145 842,123'],
+  ['245',3,0,896,177,12,'889,147 852,201 859,206 876,225 928,188 918,173'],
+  ['216',3,0,320,177,14,'329,148 311,162 294,180 290,187 343,225 346,220 367,200 332,149'],
+  ['108',3,0,382,212,14,'395,189 374,199 352,218 372,237 403,215'],
+  ['135',3,0,837,210,14,'823,189 816,214 829,220 850,236 867,218 843,198'],
+  ['217',3,0,289,221,12,'287,190 273,216 266,240 328,255 331,245 341,228'],
+  ['244',3,0,925,221,12,'930,190 879,228 888,246 890,255 953,240 947,220'],
+  ['243',3,0,940,270,12,'954,243 891,258 895,276 895,297 959,296 959,273'],
+  ['218',3,0,275,270,12,'264,245 259,272 259,296 323,297 324,273 327,258 272,244'],
+  ['219',3,0,275,325,14,'259,299 258,353 323,353 323,300'],
+  ['242',3,0,943,326,12,'960,299 895,300 896,353 960,353'],
+  ['132',3,0,878,330,12,'893,307 825,308 825,353 893,353'],
+  ['220',3,0,275,377,14,'258,356 258,403 323,403 323,356'],
+  ['131',3,0,877,379,14,'825,357 825,402 893,402 893,357'],
+  ['241',3,0,944,379,14,'896,356 896,404 960,404 960,356'],
+  ['130',3,0,877,428,12,'825,405 825,450 893,451 893,405'],
+  ['221',3,0,274,427,12,'258,406 258,452 323,452 323,406'],
+  ['240',3,0,943,428,12,'896,407 896,454 960,454 961,407'],
+  ['129',3,0,877,475,14,'825,454 825,498 893,499 893,454'],
+  ['222',3,0,275,480,14,'258,456 258,504 323,502 323,456'],
+  ['239',3,0,943,481,14,'896,457 896,503 959,506 960,457'],
+  ['223',3,0,277,533,12,'323,505 259,508 259,535 264,562 327,548 324,532'],
+  ['238',3,0,939,535,14,'896,506 895,531 891,549 953,563 959,535 959,509'],
+  ['224',3,0,291,584,14,'329,551 265,566 271,585 289,617 342,578 331,559'],
+  ['237',3,0,929,586,12,'890,552 882,571 876,579 921,613 929,617 944,592 952,571 952,566'],
+  ['225',3,0,321,629,14,'344,581 291,620 307,639 332,660 369,606 369,604 360,598'],
+  ['236',3,0,895,628,14,'874,582 858,599 848,606 882,656 886,659 904,646 920,630 926,620'],
+  ['308',4,0,367,88,14,'389,69 366,73 340,83 359,128 382,119 396,117'],
+  ['347',4,0,846,88,12,'827,69 818,117 842,120 857,126 875,82 856,74'],
+  ['346',4,0,893,108,14,'879,83 860,128 878,136 894,147 924,109 904,95'],
+  ['309',4,0,322,109,14,'337,84 314,95 292,111 322,149 341,136 356,129'],
+  ['345',4,0,931,139,14,'927,111 897,149 924,176 964,147 938,119'],
+  ['310',4,0,284,139,14,'288,114 280,120 253,149 292,179 296,173 320,151 295,119'],
+  ['344',4,0,965,179,12,'966,150 926,179 938,195 947,213 991,194 982,173'],
+  ['311',4,0,252,179,12,'251,152 236,173 225,196 270,216 280,195 290,182'],
+  ['343',4,0,985,224,14,'993,197 948,216 954,229 959,253 1008,245 1003,220'],
+  ['312',4,0,231,226,12,'224,199 216,218 210,248 259,257 262,239 269,219'],
+  ['342',4,0,997,274,14,'1009,249 959,256 963,299 1015,298'],
+  ['313',4,0,222,277,14,'210,251 203,302 256,303 256,270 258,260'],
+  ['341',4,0,1001,325,14,'963,302 964,349 1019,349 1016,302'],
+  ['314',4,0,217,328,12,'203,305 200,322 199,352 255,353 255,306'],
+  ['340',4,0,1004,376,14,'963,353 964,400 1021,400 1020,353'],
+  ['315',4,0,213,378,12,'199,356 197,403 255,403 255,356'],
+  ['339',4,0,1004,425,14,'963,403 963,449 1020,450 1021,403'],
+  ['316',4,0,213,427,14,'197,406 199,453 255,452 255,406'],
+  ['338',4,0,1000,477,14,'963,452 962,499 1016,500 1020,453'],
+  ['317',4,0,215,480,14,'255,455 199,456 200,486 203,504 255,502'],
+  ['337',4,0,996,527,12,'962,502 962,536 960,545 1008,553 1013,532 1015,504'],
+  ['318',4,0,222,530,14,'255,506 203,507 210,556 258,548'],
+  ['336',4,0,986,576,14,'959,548 955,572 949,586 995,606 1001,592 1008,556'],
+  ['319',4,0,231,577,14,'259,552 210,559 216,588 225,609 270,589 263,572'],
+  ['335',4,0,965,623,12,'948,590 939,608 928,623 967,654 984,629 993,609'],
+  ['320',4,0,254,626,14,'272,593 226,612 240,639 253,656 292,626 281,612'],
+  ['334',4,0,933,664,14,'926,626 921,633 897,656 927,694 957,667 964,656'],
+  ['321',4,0,284,665,12,'294,629 255,659 273,679 291,694 321,656'],
+  ['333',4,0,894,696,14,'894,657 879,668 860,677 879,722 905,710 924,696'],
+  ['322',4,0,326,698,14,'324,658 294,697 313,710 339,722 359,677 341,669'],
+  ['323',4,0,370,717,12,'362,678 343,723 362,731 392,737 400,688 380,685'],
+  ['332',4,0,848,719,14,'857,679 834,686 819,688 826,737 854,732 876,724'],
+  ['109',5,0,351,244,14,'350,220 340,233 331,255 358,262 369,241 369,238'],
+  ['134',5,0,868,241,14,'869,221 852,238 863,261 887,255 879,234'],
+  ['133',5,0,876,280,14,'822,268 825,276 825,305 892,304 892,273 888,257 866,264 861,263 850,241'],
+  ['110',5,0,342,282,14,'399,268 373,242 370,244 360,264 354,265 330,258 326,280 326,304 397,305 397,274'],
+  ['111',5,0,349,330,14,'326,307 326,353 397,353 397,308'],
+  ['112',5,0,361,379,15,'326,357 326,402 397,402 397,357'],
+  ['113',5,0,341,426,12,'326,405 326,451 397,450 397,405'],
+  ['114',5,0,341,476,12,'326,454 326,499 397,498 397,454'],
+  ['115',5,0,343,526,12,'397,501 326,503 327,534 331,548 356,541 361,544 365,553 368,555 399,538 400,536 397,529'],
+  ['128',5,0,877,524,14,'825,501 825,528 821,536 823,540 851,555 857,543 861,541 888,549 892,533 893,503'],
+  ['117',5,0,383,592,14,'403,540 388,546 369,558 376,569 376,573 359,592 364,598 375,606 395,616 400,609 416,551'],
+  ['126',5,0,837,594,14,'818,541 810,548 803,551 820,615 824,616 844,606 854,599 860,592 842,573 842,569 849,558'],
+  ['116',5,0,354,565,14,'357,544 332,552 340,571 355,590 374,572'],
+  ['127',5,0,866,566,12,'860,544 852,561 844,572 863,591 877,574 887,552'],
+  ['203',6,0,717,139,11,'728,128 727,179 705,179 706,128'],
+  ['202',6,0,742,149,11,'755,179 730,180 731,128 755,127'],
+  ['201',6,0,771,149,11,'783,180 758,180 759,128 784,127'],
+  ['213',6,0,447,140,11,'460,128 461,180 440,181 436,179 435,128'],
+  ['212',6,0,475,140,11,'488,128 489,180 464,179 463,128'],
+  ['211',6,0,501,156,11,'510,128 511,179 492,179 491,139 491,128'],
+  ['210',6,0,527,149,11,'541,128 543,179 514,179 513,128'],
+  ['209',6,0,557,149,11,'569,128 569,179 546,179 545,128'],
+  ['208',6,0,583,149,11,'595,128 595,179 572,179 572,128'],
+  ['207',6,0,610,149,11,'622,128 622,179 598,179 598,128'],
+  ['206',6,0,636,139,11,'647,128 645,179 625,179 625,128'],
+  ['205',6,0,661,149,11,'674,128 673,179 649,179 650,128'],
+  ['204',6,0,689,149,11,'703,128 702,179 676,179 678,128'],
+  ['103',6,0,635,205,15,'610,182 611,228 660,228 661,182'],
+  ['105',6,0,531,205,14,'503,183 505,228 555,228 554,182'],
+  ['104',6,0,581,205,14,'557,182 558,228 608,228 607,182'],
+  ['102',6,0,687,206,15,'664,183 663,229 714,228 714,183'],
+  ['120',6,0,528,598,15,'504,574 503,622 554,622 554,574']
+];
+
+// ================= seat map (cart section) =================
+const CAT = { 1: '#d6013b', 2: '#eb6609', 3: '#a0c408', 4: '#00529e', 5: '#f5ba04', 6: '#898989' };
+let mapSig = '', mapPick = null;
+function renderMap(items) {
+  const box = $('seatMap'), info = $('mapInfo');
+  if (!items.length) { box.classList.add('hidden'); info.classList.add('hidden'); mapSig = ''; mapPick = null; return; }
+  box.classList.remove('hidden');
+  const list = items.map((it, i) => ({ ...it, n: i + 1, block: String(it.key || '').split('|')[0] }));
+  const sig = JSON.stringify(list.map(i => [i.key, i.n])) + lang;
+  if (sig !== mapSig) {
+    mapSig = sig;
+    const by = {}; list.forEach(i => { (by[i.block] = by[i.block] || []).push(i); });
+    let g = '<rect class="pitchbg" x="398" y="256" width="426" height="294" rx="22"/><g class="lines"><line x1="610" y1="266" x2="610" y2="540"/><circle cx="610" cy="402" r="51"/>'
+      + '<path d="M413 321H483V488H413M413 365H437V443H413M483 368A44 44 0 0 1 483 437"/><path d="M809 321H741V488H809M809 365H785V443H809M741 368A44 44 0 0 0 741 437"/></g>';
+    for (const [num, cat, , , , , pts] of STADIUM)
+      g += `<polygon class="blk" data-b="${num}" points="${pts}" fill="${CAT[cat]}" opacity="${by[num] ? 1 : 0.22}"/>`;
+    for (const [num, , part, x, y, size] of STADIUM)
+      if (!part && size) g += `<text class="num${by[num] ? ' on' : ''}" x="${x}" y="${y}" font-size="${size}" text-anchor="middle" dominant-baseline="central" pointer-events="none">${num}</text>`;
+    for (const [num, its] of Object.entries(by)) {
+      const shapes = STADIUM.filter(b => b[0] === num);
+      if (!shapes.length) continue;
+      shapes.forEach(b => { g += `<polygon points="${b[6]}" fill="none" stroke="#111" stroke-width="3.5" stroke-linejoin="round" pointer-events="none"/>`; });
+      const pts = (shapes.find(b => !b[2]) || shapes[0])[6].split(' ').map(p => p.split(',').map(Number));
+      const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+      const mx = (Math.min(...xs) + Math.max(...xs)) / 2, my = Math.min(...ys) - 4, label = its.map(i => i.n).join(','), w = Math.max(30, 12 + label.length * 11);
+      g += `<g pointer-events="none"><rect x="${(mx - w / 2).toFixed(0)}" y="${(my - 15).toFixed(0)}" width="${w}" height="30" rx="15" fill="#111" stroke="#fff" stroke-width="2.5"/>`
+        + `<text x="${mx.toFixed(0)}" y="${my.toFixed(0)}" font-size="18" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="central">${label}</text></g>`;
+    }
+    box.innerHTML = `<svg viewBox="180 20 860 780" xmlns="http://www.w3.org/2000/svg" role="img">${g}</svg>`;
+    box.querySelectorAll('polygon[data-b]').forEach(p => { p.onclick = () => { mapPick = p.dataset.b; showPick(by); }; });
+    box._by = by;
+    if (mapPick && !by[mapPick]) mapPick = null;
+  }
+  showPick(box._by);
+}
+function showPick(by) {
+  const info = $('mapInfo');
+  const mapped = new Set(STADIUM.map(b => b[0]));
+  const off = Object.keys(by).filter(b => !mapped.has(b)).flatMap(b => by[b].map(i => i.seatInfo));
+  let html = '';
+  if (mapPick && by[mapPick]) html = by[mapPick].map(i => `<div><b>${i.n}</b> · ${esc(i.seatInfo)} <span class="p">· ${esc(i.price)}</span></div>`).join('');
+  else html = `<span class="p">${esc(T.mapTap)}</span>`;
+  if (off.length) html += `<div class="p">${esc(fmt(T.mapOff, { t: off.join(', ') }))}</div>`;
+  info.innerHTML = html; info.classList.remove('hidden');
+}
+
+// ================= skipped tickets =================
+let skipOpen = false;
+function renderSkip(list) {
+  const n = list.length;
+  if (!n) skipOpen = false;
+  $('skipRow').classList.toggle('hidden', !n);
+  $('skipText').textContent = fmt(T.skipping, { n });
+  $('skipToggle').textContent = skipOpen ? T.skipHide : T.skipShow;
+  $('skipList').classList.toggle('hidden', !skipOpen);
+  if (!skipOpen) return;
+  const why = s => s.r === 'removed' ? T.rsRemoved : s.r === 'error' ? T.rsError : fmt(T.rsFailed, { n: s.n || '' });
+  const when = ts => new Date(ts - offset).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  $('skipList').innerHTML = list.map(s => `<div class="item"><span>${esc(s.l)} <span class="why">· ${esc(why(s))} · ${esc(fmt(T.rsUntil, { t: when(s.until) }))}</span></span>
+      <button class="small" data-allow="${esc(s.key)}" type="button">${T.allowOne}</button></div>`).join('')
+    + `<div class="btns"><button id="allowAll" type="button">${T.allowAll}</button></div>`;
+  $('skipList').querySelectorAll('[data-allow]').forEach(b => { b.onclick = () => send('skipAllow', { key: b.dataset.allow }); });
+  $('allowAll').onclick = () => { skipOpen = false; send('skipClear'); };
 }
 
 function tick() {
@@ -512,6 +752,7 @@ function openSettings() {
   $('fRefresh').value = showNum(h.refresh); $('fJitter').value = showNum(h.jitter);
   $('fSound').checked = h.sound; $('fNtfy').checked = n.ntfy; $('fDesktop').checked = n.desktop;
   $('fStuck').checked = n.stuck; $('fStuckMin').value = n.stuckMin;
+  $('fFail').value = h.failLimit ?? 3; $('fFailMin').value = h.failMinutes ?? 30;
   document.querySelectorAll('.err').forEach(e => e.classList.add('hidden'));
   showModeFields();
   $('mainView').classList.add('hidden'); $('settingsView').classList.remove('hidden');
@@ -521,6 +762,7 @@ function closeSettings() { $('settingsView').classList.add('hidden'); $('mainVie
 function saveSettings() {
   const mode = $('fMode').value, refresh = parseNum($('fRefresh').value), jitter = parseNum($('fJitter').value);
   const seats = parseInt($('fSeats').value, 10), stuckMin = parseNum($('fStuckMin').value);
+  const failLimit = parseInt($('fFail').value, 10), failMinutes = parseInt($('fFailMin').value, 10);
   const errors = {
     Price: mode === 'price' && parseNum(String($('fPrice').value).replace(/[^\d,.]/g, '')) === null,
     Blocks: mode === 'blocks' && !$('fBlocks').value.trim(),
@@ -528,6 +770,8 @@ function saveSettings() {
     Refresh: refresh === null || refresh < 1,
     Jitter: jitter === null || jitter < 0 || (refresh !== null && jitter >= refresh),
     StuckMin: $('fStuck').checked && !(stuckMin >= 1),
+    Fail: !(failLimit >= 0 && failLimit <= 20),
+    FailMin: !(failMinutes >= 1 && failMinutes <= 1440),
   };
   let first = null;
   for (const [k, bad] of Object.entries(errors)) { $('e' + k).classList.toggle('hidden', !bad); if (bad && !first) first = $('f' + k); }
@@ -537,6 +781,7 @@ function saveSettings() {
   if (mode === 'blocks') p.blocks = $('fBlocks').value.trim();
   if (mode === 'adjacent') p.seats = seats;
   if (stuckMin >= 1) p.stuckMin = stuckMin;
+  p.failLimit = failLimit; p.failMinutes = failMinutes;
   send('set', p);
   closeSettings();
 }
@@ -554,7 +799,7 @@ function wire() {
   $('cancel').onclick = closeSettings;
   $('save').onclick = saveSettings;
   $('fMode').onchange = showModeFields;
-  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin'].forEach(k => { $('f' + k).oninput = () => $('e' + k).classList.add('hidden'); });
+  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin', 'Fail', 'FailMin'].forEach(k => { $('f' + k).oninput = () => $('e' + k).classList.add('hidden'); });
   $('match').onchange = () => { const v = $('match').value; if (v !== '__text') send('match', { key: v }); };
   $('acc').onchange = () => {
     const to = $('acc').value;
@@ -568,7 +813,7 @@ function wire() {
   $('removeAll').onclick = () => confirmTap($('removeAll'), 'all', T.removeAllSure, () => send('removeAll'));
   $('checkout').onclick = () => send('checkout');
   $('hunt').onclick = () => send('hunt');
-  $('skipClear').onclick = () => send('skipClear');
+  $('skipToggle').onclick = () => { skipOpen = !skipOpen; render(); };
   $('unpair').onclick = () => confirmTap($('unpair'), 'unpair', T.unpairSure, () => {
     localStorage.removeItem('rp_key'); localStorage.removeItem('rp_state'); if (es) es.close(); ctx = null; st = null; justPaired = false;
     if (location.hash) history.replaceState(null, '', location.pathname + location.search); render();
