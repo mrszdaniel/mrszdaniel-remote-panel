@@ -196,7 +196,7 @@ label > input, label > select { margin-top: 5px; }
     </section>
   </main>
 
-  <div class="foot"><span id="updated"></span><button id="unpair" type="button"></button></div>
+  <div class="foot"><span id="updated"></span><button id="unpair" type="button"></button><div id="ver" style="margin-top:4px"></div></div>
 </div>
 <div class="toast hidden" id="toast"></div>
 
@@ -204,6 +204,7 @@ label > input, label > select { margin-top: 5px; }
 (() => {
 'use strict';
 const DB_URL = 'https://remote-panel-c2375-default-rtdb.europe-west1.firebasedatabase.app';
+const PHONE_VERSION = '2.0.0';      // shown at the bottom, next to the computer's script version
 const ONLINE_MS = 40000;          // the computer reports at least every 15 s while this page is open
 
 // ================= texts =================
@@ -458,6 +459,7 @@ function render() {
   $('onlineText').textContent = !st ? T.connecting : online ? T.online : T.offline;
   if (!paired) return;
   $('updated').textContent = st ? fmt(T.updated, { t: clock(received) }) : T.never;
+  $('ver').textContent = `Phone v${PHONE_VERSION}` + (st && st.ver ? ` · Computer v${st.ver}` : '');
   if (armed !== 'unpair') $('unpair').textContent = T.unpair;
   if (!st) return;
 
