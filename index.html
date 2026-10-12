@@ -184,7 +184,7 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 .head { position: sticky; top: 0; }
 .tabbar { position: fixed; left: 0; right: 0; bottom: 0; }
 #scroller { display: block; }
-.diag { font-size: 11px; color: var(--faint); margin-top: 8px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
 /* 2.3.0: status card, latest event, cart cards, appearance switch, icons */
 .statusline { font-size: 21px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .statusline .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex: none; }
@@ -347,7 +347,7 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
       <h2 id="hPhone"></h2>
       <div class="sub" id="ver"></div>
       <div class="sub" id="updated"></div>
-      <div class="diag" id="diag"></div><div id="diagProbe" style="position:fixed;top:0;left:0;width:0;height:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none"></div>
+
       <label style="margin-top:14px" id="lTheme"></label>
       <div class="seg" role="group" aria-labelledby="lTheme"><button type="button" id="thLight"></button><button type="button" id="thDark"></button><button type="button" id="thSystem"></button></div>
       <div class="btns"><button class="danger" id="unpair" type="button"></button></div>
@@ -379,7 +379,7 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 (() => {
 'use strict';
 const DB_URL = 'https://remote-panel-c2375-default-rtdb.europe-west1.firebasedatabase.app';
-const PHONE_VERSION = '2.3.3';      // shown at the bottom, next to the computer's script version
+const PHONE_VERSION = '2.3.4';      // shown at the bottom, next to the computer's script version
 const ONLINE_MS = 40000;          // the computer reports at least every 15 s while this page is open
 
 // ================= texts =================
@@ -860,7 +860,6 @@ function render() {
   $('latestCard').classList.toggle('hidden', !ev.length);
   $('latest').innerHTML = ev.length ? `<div class="ev"><time>${clock(ev[0].at - offset)}</time><span>${esc(ev[0][lang] || ev[0].en)}</span></div>` : '';
   ['Light', 'Dark', 'System'].forEach(k => $('th' + k).setAttribute('aria-pressed', String(theme() === k.toLowerCase())));
-  diag();
 
   if (view === 'presets' && !presetEdit) renderPresets();
 }
@@ -1386,16 +1385,7 @@ function renderSkip(list) {
   $('allowAll').onclick = () => { skipOpen = false; send('skipClear'); };
 }
 
-// 2.3.3 (temporary): the heights iOS reports, shown under More → This phone
-function diag() {
-  const el = $('diag'); if (!el) return;
-  const pr = getComputedStyle($('diagProbe')), vv = window.visualViewport;
-  const tb = $('tabbar').getBoundingClientRect();
-  el.textContent = `inner ${innerHeight} · vv ${vv ? Math.round(vv.height) : '-'} · doc ${document.documentElement.clientHeight} · page ${document.documentElement.scrollHeight} · screen ${screen.width}×${screen.height}`
-    + ` · safe ${parseInt(pr.paddingTop) || 0}/${parseInt(pr.paddingBottom) || 0} · bar ${Math.round(tb.top)}–${Math.round(tb.bottom)} · app ${standalone ? 'yes' : 'no'}`;
-}
 async function main() {
-  window.addEventListener('resize', () => diag());
   staticTexts();
   wire();
   if (!window.crypto || !crypto.subtle) { $('upText').textContent = 'This browser can\'t encrypt. Open the page in Safari.'; render(); return; }
