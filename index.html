@@ -174,11 +174,17 @@ label > input, label > select { margin-top: 5px; }
 :root[data-theme="dark"] .newrep { color: #ffb3c1; }
 :root[data-theme="dark"] .prow.on { background: #3d1d24; }
 /* 2.3.0: the frame */
-html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
-/* 2.3.1: pinned to all four screen edges. On iPhone home-screen apps with the translucent status bar,
-   100vh / 100dvh is short by the status bar's height, which left a grey strip under the tab bar. */
-body { display: flex; flex-direction: column; position: fixed; top: 0; right: 0; bottom: 0; left: 0; }
-#scroller { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-bottom: 16px; }
+/* 2.3.3: the page scrolls as a whole, header fixed on top (sticky), tab bar fixed at the bottom.
+   On the iPhone home-screen app, iOS drew the app down to the real bottom edge only when the page itself
+   could scroll (2.2.0: right on Settings/More, wrong on the short Status/Cart). So every tab is made a bit
+   taller than the screen, and the bounce at the ends is switched off (keeps the header in place). */
+html, body { overscroll-behavior: none; }
+html { min-height: calc(100vh + env(safe-area-inset-top, 0px) + 1px); }
+body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+.head { position: sticky; top: 0; }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; }
+#scroller { display: block; }
+.diag { font-size: 11px; color: var(--faint); margin-top: 8px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 /* 2.3.0: status card, latest event, cart cards, appearance switch, icons */
 .statusline { font-size: 21px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .statusline .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex: none; }
@@ -341,6 +347,7 @@ body { display: flex; flex-direction: column; position: fixed; top: 0; right: 0;
       <h2 id="hPhone"></h2>
       <div class="sub" id="ver"></div>
       <div class="sub" id="updated"></div>
+      <div class="diag" id="diag"></div><div id="diagProbe" style="position:fixed;top:0;left:0;width:0;height:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none"></div>
       <label style="margin-top:14px" id="lTheme"></label>
       <div class="seg" role="group" aria-labelledby="lTheme"><button type="button" id="thLight"></button><button type="button" id="thDark"></button><button type="button" id="thSystem"></button></div>
       <div class="btns"><button class="danger" id="unpair" type="button"></button></div>
@@ -372,7 +379,7 @@ body { display: flex; flex-direction: column; position: fixed; top: 0; right: 0;
 (() => {
 'use strict';
 const DB_URL = 'https://remote-panel-c2375-default-rtdb.europe-west1.firebasedatabase.app';
-const PHONE_VERSION = '2.3.2';      // shown at the bottom, next to the computer's script version
+const PHONE_VERSION = '2.3.3';      // shown at the bottom, next to the computer's script version
 const ONLINE_MS = 40000;          // the computer reports at least every 15 s while this page is open
 
 // ================= texts =================
@@ -758,7 +765,7 @@ function showView(next) {
   for (const [k, id] of Object.entries(VIEWS)) $(id).classList.toggle('hidden', k !== view);
   const tabOf = view === 'presets' ? presetsFrom : view;
   [['status', 'tabStatus'], ['cart', 'tabCart'], ['settings', 'tabSettings'], ['more', 'tabMore']].forEach(([k, id]) => $(id).setAttribute('aria-selected', String(k === tabOf)));
-  $('scroller').scrollTop = 0;
+  window.scrollTo(0, 0);
   render();
 }
 function openPresets(seedNew) {
@@ -853,6 +860,7 @@ function render() {
   $('latestCard').classList.toggle('hidden', !ev.length);
   $('latest').innerHTML = ev.length ? `<div class="ev"><time>${clock(ev[0].at - offset)}</time><span>${esc(ev[0][lang] || ev[0].en)}</span></div>` : '';
   ['Light', 'Dark', 'System'].forEach(k => $('th' + k).setAttribute('aria-pressed', String(theme() === k.toLowerCase())));
+  diag();
 
   if (view === 'presets' && !presetEdit) renderPresets();
 }
@@ -994,7 +1002,7 @@ function askSwitch(to) {
   const cart = st.cart.count || 0;
   $('confirmText').textContent = fmt(T.switchConfirm, { from: st.account || '?', to }) + (cart > 0 ? ' ' + fmt(T.switchCart, { n: cart, from: st.account || '?' }) : '');
   $('confirm').classList.remove('hidden');
-  $('scroller').scrollTop = 0;
+  window.scrollTo(0, 0);
   $('cYes').onclick = () => { $('confirm').classList.add('hidden'); send('account', { name: to }); };
   $('cNo').onclick = () => { $('confirm').classList.add('hidden'); };
 }
@@ -1378,21 +1386,16 @@ function renderSkip(list) {
   $('allowAll').onclick = () => { skipOpen = false; send('skipClear'); };
 }
 
-// 2.3.2: as an iPhone home-screen app (translucent status bar), iOS reports a visible area that is one
-// status bar too short, leaving a grey strip under the tab bar. The screen's own height is right, so the
-// frame uses it when it is taller. Only in the home-screen app; recalculated after rotating.
-function fitScreen() {
-  if (!standalone || !window.screen) return;
-  const sw = screen.width, sh = screen.height, landscape = innerWidth > innerHeight;
-  const real = landscape ? Math.min(sw, sh) : Math.max(sw, sh);
-  const h = Math.max(innerHeight, real);
-  document.body.style.bottom = 'auto';
-  document.body.style.height = h + 'px';
+// 2.3.3 (temporary): the heights iOS reports, shown under More → This phone
+function diag() {
+  const el = $('diag'); if (!el) return;
+  const pr = getComputedStyle($('diagProbe')), vv = window.visualViewport;
+  const tb = $('tabbar').getBoundingClientRect();
+  el.textContent = `inner ${innerHeight} · vv ${vv ? Math.round(vv.height) : '-'} · doc ${document.documentElement.clientHeight} · page ${document.documentElement.scrollHeight} · screen ${screen.width}×${screen.height}`
+    + ` · safe ${parseInt(pr.paddingTop) || 0}/${parseInt(pr.paddingBottom) || 0} · bar ${Math.round(tb.top)}–${Math.round(tb.bottom)} · app ${standalone ? 'yes' : 'no'}`;
 }
 async function main() {
-  fitScreen();
-  window.addEventListener('resize', fitScreen);
-  window.addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
+  window.addEventListener('resize', () => diag());
   staticTexts();
   wire();
   if (!window.crypto || !crypto.subtle) { $('upText').textContent = 'This browser can\'t encrypt. Open the page in Safari.'; render(); return; }
