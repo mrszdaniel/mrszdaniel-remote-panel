@@ -372,7 +372,7 @@ body { display: flex; flex-direction: column; position: fixed; top: 0; right: 0;
 (() => {
 'use strict';
 const DB_URL = 'https://remote-panel-c2375-default-rtdb.europe-west1.firebasedatabase.app';
-const PHONE_VERSION = '2.3.1';      // shown at the bottom, next to the computer's script version
+const PHONE_VERSION = '2.3.2';      // shown at the bottom, next to the computer's script version
 const ONLINE_MS = 40000;          // the computer reports at least every 15 s while this page is open
 
 // ================= texts =================
@@ -1378,7 +1378,21 @@ function renderSkip(list) {
   $('allowAll').onclick = () => { skipOpen = false; send('skipClear'); };
 }
 
+// 2.3.2: as an iPhone home-screen app (translucent status bar), iOS reports a visible area that is one
+// status bar too short, leaving a grey strip under the tab bar. The screen's own height is right, so the
+// frame uses it when it is taller. Only in the home-screen app; recalculated after rotating.
+function fitScreen() {
+  if (!standalone || !window.screen) return;
+  const sw = screen.width, sh = screen.height, landscape = innerWidth > innerHeight;
+  const real = landscape ? Math.min(sw, sh) : Math.max(sw, sh);
+  const h = Math.max(innerHeight, real);
+  document.body.style.bottom = 'auto';
+  document.body.style.height = h + 'px';
+}
 async function main() {
+  fitScreen();
+  window.addEventListener('resize', fitScreen);
+  window.addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
   staticTexts();
   wire();
   if (!window.crypto || !crypto.subtle) { $('upText').textContent = 'This browser can\'t encrypt. Open the page in Safari.'; render(); return; }
