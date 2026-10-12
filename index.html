@@ -12,6 +12,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <title>Ticket hunter</title>
+<script>try { var th = localStorage.getItem('rp_theme'); if (th === 'light' || th === 'dark') document.documentElement.setAttribute('data-theme', th); } catch (e) {}</script>
 <style>
 :root {
   --red: #dc052d; --red-dark: #b80426;
@@ -20,19 +21,10 @@
   --ok: #137333; --warn: #9a5b00; --bad: #c5221f; --link: #0066b2;
   --warn-bg: #fff4e5; --bad-bg: #fdecea; --ok-bg: #e7f4ea;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111113; --card: #1c1c1f; --soft: #26262a; --line: #303035;
-    --ink: #f1f1f3; --muted: #a3a3ab; --faint: #7d7d85;
-    --ok: #6fcf8c; --warn: #f0b45a; --bad: #ff7b72; --link: #6cb6ff;
-    --warn-bg: #3a2d16; --bad-bg: #3d1d1b; --ok-bg: #173322;
-  }
-}
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink);
   font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; -webkit-text-size-adjust: 100%; }
-body { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
-.head { position: sticky; top: 0; z-index: 5; background: var(--red); color: #fff;
+.head { flex: none; z-index: 5; background: var(--red); color: #fff;
   padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; display: flex; align-items: center; gap: 10px; }
 .head .name { flex: 1; font-weight: 600; font-size: 18px; }
 .pill { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #fff; color: #555; white-space: nowrap; }
@@ -105,7 +97,6 @@ label > input, label > select { margin-top: 5px; }
 #skipList .why { color: var(--muted); }
 .hidden { display: none !important; }
 /* ---- 2.2.0: one structure with the panel: bar, cart strip, tabs at the bottom ---- */
-body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 .bar { background: var(--card); border-bottom: 1px solid var(--line); padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
 .bar select { flex: 1; min-width: 0; margin: 0; }
 .acc { all: unset; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line);
@@ -120,7 +111,6 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 .strip { display: block; width: auto; margin: 12px 12px 0; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; font-size: 15px; }
 .strip.empty { color: var(--muted); }
 .strip.full { background: #fde8ec; border-color: #f3b5c1; color: #9a0420; }
-@media (prefers-color-scheme: dark) { .strip.full { background: #3d1d24; border-color: #6a2a37; color: #ffb3c1; } }
 .strip .top { display: flex; justify-content: space-between; font-weight: 600; } .strip .top span:last-child { font-weight: 400; color: var(--link); }
 .strip .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
 .strip .tag { background: var(--card); color: var(--ink); border-radius: 999px; padding: 2px 10px; font-size: 13px; }
@@ -128,11 +118,10 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 .chip { all: unset; cursor: pointer; font-size: 15px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line);
   background: var(--card); display: inline-flex; align-items: center; gap: 6px; -webkit-tap-highlight-color: transparent; }
 .chip[aria-pressed="true"] { border-color: var(--red); background: #fde8ec; color: #9a0420; font-weight: 600; }
-@media (prefers-color-scheme: dark) { .chip[aria-pressed="true"] { background: #3d1d24; color: #ffb3c1; } }
 .chip.changed { border-color: #e3a33b; background: var(--warn-bg); color: var(--warn); }
 .chip.dashed { border-style: dashed; color: var(--muted); }
 .chip svg { flex: none; }
-.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--card); border-top: 1px solid var(--line);
+.tabbar { flex: none; z-index: 6; background: var(--card); border-top: 1px solid var(--line);
   padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .tabbar button { all: unset; cursor: pointer; min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   font-size: 12px; color: var(--muted); position: relative; -webkit-tap-highlight-color: transparent; }
@@ -152,10 +141,8 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
 .tile { background: var(--soft); border-radius: 12px; padding: 10px 12px; } .tile .k { font-size: 13px; color: var(--muted); } .tile .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .newrep { color: #9a0420; font-size: 14px; margin-top: 4px; }
-@media (prefers-color-scheme: dark) { .newrep { color: #ffb3c1; } }
 .prow { border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; margin-top: 8px; background: var(--card); }
 .prow.on { border-color: var(--red); background: #fde8ec; }
-@media (prefers-color-scheme: dark) { .prow.on { background: #3d1d24; } }
 .prow .use { all: unset; cursor: pointer; display: block; width: 100%; min-height: 44px; }
 .prow .nm { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
 .prow .ds { font-size: 14px; color: var(--muted); }
@@ -166,6 +153,49 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 .back { all: unset; cursor: pointer; color: var(--link); font-size: 16px; min-height: 36px; display: inline-flex; align-items: center; }
 .toast { bottom: calc(82px + env(safe-area-inset-bottom, 0px)); }
 
+/* 2.3.0: appearance. System follows the iPhone; Light or Dark (More → This phone) is forced via <html data-theme> */
+:root { color-scheme: light dark; } :root[data-theme="light"] { color-scheme: light; } :root[data-theme="dark"] { color-scheme: dark; }
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) { --bg: #111113; --card: #1c1c1f; --soft: #26262a; --line: #303035;
+    --ink: #f1f1f3; --muted: #a3a3ab; --faint: #7d7d85;
+    --ok: #6fcf8c; --warn: #f0b45a; --bad: #ff7b72; --link: #6cb6ff;
+    --warn-bg: #3a2d16; --bad-bg: #3d1d1b; --ok-bg: #173322; }
+:root:not([data-theme="light"]) .strip.full { background: #3d1d24; border-color: #6a2a37; color: #ffb3c1; }
+:root:not([data-theme="light"]) .chip[aria-pressed="true"] { background: #3d1d24; color: #ffb3c1; }
+:root:not([data-theme="light"]) .newrep { color: #ffb3c1; }
+:root:not([data-theme="light"]) .prow.on { background: #3d1d24; }
+}
+:root[data-theme="dark"] { --bg: #111113; --card: #1c1c1f; --soft: #26262a; --line: #303035;
+    --ink: #f1f1f3; --muted: #a3a3ab; --faint: #7d7d85;
+    --ok: #6fcf8c; --warn: #f0b45a; --bad: #ff7b72; --link: #6cb6ff;
+    --warn-bg: #3a2d16; --bad-bg: #3d1d1b; --ok-bg: #173322; }
+:root[data-theme="dark"] .strip.full { background: #3d1d24; border-color: #6a2a37; color: #ffb3c1; }
+:root[data-theme="dark"] .chip[aria-pressed="true"] { background: #3d1d24; color: #ffb3c1; }
+:root[data-theme="dark"] .newrep { color: #ffb3c1; }
+:root[data-theme="dark"] .prow.on { background: #3d1d24; }
+/* 2.3.0: the frame */
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+#scroller { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-bottom: 16px; }
+/* 2.3.0: status card, latest event, cart cards, appearance switch, icons */
+.statusline { font-size: 21px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.statusline .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex: none; }
+.statusline.hunting .dot { background: var(--ok); } .statusline.paused .dot, .statusline.hold .dot { background: var(--warn); }
+.statusline.clicking .dot { background: var(--red); } .statusline.away .dot { background: var(--link); }
+.tiles3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.tilew { background: var(--soft); border-radius: 12px; padding: 10px 12px; margin-top: 12px; }
+.tilew .k, .tiles3 .k { font-size: 13px; color: var(--muted); } .tilew .v { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.tiles3 .tile { padding: 9px 10px; } .tiles3 .v { font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.carttitle { font-size: 18px; font-weight: 600; } .cartlimit { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.citem { display: flex; align-items: center; gap: 10px; background: var(--soft); border-radius: 12px; padding: 10px 12px; margin-top: 8px; }
+.citem .num { flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--card); font-size: 13px; font-weight: 700; display: grid; place-items: center; }
+.citem .txt { flex: 1; min-width: 0; font-size: 15px; } .citem .meta { font-size: 13px; color: var(--muted); }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-top: 8px; }
+.seg button { border: none; border-radius: 0; padding: 9px 6px; font-size: 15px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--card); }
+.ico { display: inline-flex; vertical-align: -3px; }
+#toggle { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.strip.empty { display: flex; align-items: center; gap: 8px; }
 </style>
 </head>
 <body>
@@ -175,6 +205,7 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
   <button class="lang" id="lang" type="button"></button>
 </div>
 
+<div id="scroller">
 <!-- not paired -->
 <div class="intro hidden" id="unpaired"><b id="upTitle"></b><span id="upText"></span>
   <label style="text-align:left;margin-top:22px"><span id="lPaste"></span><input type="text" id="paste" autocapitalize="off" autocomplete="off" autocorrect="off"></label>
@@ -198,21 +229,23 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
   <!-- Status -->
   <main id="vStatus">
     <section class="card">
-      <div class="big" id="state"><span class="dot"></span><span id="stateText"></span></div>
+      <div class="statusline" id="state"><span class="dot"></span><span id="stateText"></span></div>
       <div class="sub" id="navMsg"></div>
       <div class="banner bad hidden" id="stuck"></div>
-      <div class="rows">
-        <div class="row"><span class="k" id="kMode"></span><span class="v" id="vMode"></span></div>
-        <div class="row"><span class="k" id="kPage"></span><span class="v" id="vPage"></span></div>
-        <div class="row"><span class="k" id="kLast"></span><span class="v" id="vLast"></span></div>
-        <div class="row"><span class="k" id="kListed"></span><span class="v" id="vListed"></span></div>
-        <div class="row"><span class="k" id="kChecks"></span><span class="v" id="vChecks"></span></div>
-        <div class="row"><span class="k" id="kRefresh"></span><span class="v" id="vRefresh"></span></div>
+      <div class="tilew"><div class="k" id="kMode"></div><div class="v" id="vMode"></div></div>
+      <div class="tiles3">
+        <div class="tile"><div class="k" id="kListed"></div><div class="v" id="vListed"></div></div>
+        <div class="tile"><div class="k" id="kLast"></div><div class="v" id="vLast"></div></div>
+        <div class="tile"><div class="k" id="kRefresh"></div><div class="v" id="vRefresh"></div></div>
       </div>
     </section>
     <section class="card">
       <h2 id="hPreset"></h2>
       <div class="chips" id="presetChips"></div>
+    </section>
+    <section class="card hidden" id="latestCard">
+      <h2 id="hLatest"></h2>
+      <div id="latest"></div>
     </section>
     <div class="btns" style="margin-top:0"><button id="toggle" type="button"></button></div>
   </main>
@@ -220,7 +253,8 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
   <!-- Cart -->
   <main id="vCart" class="hidden">
     <section class="card">
-      <h2 id="hCart"></h2>
+      <div class="carttitle" id="hCart"></div>
+      <div class="cartlimit hidden" id="cartLimit"></div>
       <div class="banner warn hidden" id="cartTask"></div>
       <div class="seatmap hidden" id="seatMap"></div>
       <div class="mapinfo hidden" id="mapInfo"></div>
@@ -305,6 +339,8 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
       <h2 id="hPhone"></h2>
       <div class="sub" id="ver"></div>
       <div class="sub" id="updated"></div>
+      <label style="margin-top:14px" id="lTheme"></label>
+      <div class="seg" role="group" aria-labelledby="lTheme"><button type="button" id="thLight"></button><button type="button" id="thDark"></button><button type="button" id="thSystem"></button></div>
       <div class="btns"><button class="danger" id="unpair" type="button"></button></div>
     </section>
   </main>
@@ -319,13 +355,14 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
     <div class="hint" id="presetsLimit"></div>
   </main>
 
-  <nav class="tabbar" role="tablist">
+</div>
+</div>
+  <nav class="tabbar hidden" id="tabbar" role="tablist">
     <button type="button" role="tab" id="tabStatus" aria-selected="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span id="ltStatus"></span></button>
     <button type="button" role="tab" id="tabCart" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18l-2 11H5L3 9z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg><span class="n hidden" id="cartBadge"></span><span id="ltCart"></span></button>
-    <button type="button" role="tab" id="tabSettings" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span id="ltSettings"></span></button>
+    <button type="button" role="tab" id="tabSettings" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span id="ltSettings"></span></button>
     <button type="button" role="tab" id="tabMore" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span class="dotr hidden" id="moreDot"></span><span id="ltMore"></span></button>
   </nav>
-</div>
 <div class="toast hidden" id="toast"></div>
 
 
@@ -333,7 +370,7 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 (() => {
 'use strict';
 const DB_URL = 'https://remote-panel-c2375-default-rtdb.europe-west1.firebasedatabase.app';
-const PHONE_VERSION = '2.2.0';      // shown at the bottom, next to the computer's script version
+const PHONE_VERSION = '2.3.0';      // shown at the bottom, next to the computer's script version
 const ONLINE_MS = 40000;          // the computer reports at least every 15 s while this page is open
 
 // ================= texts =================
@@ -444,6 +481,13 @@ Object.assign(STR.en, {
   kChecksAll: 'Checks', kSeen: 'Tickets found', kClicked: 'Clicked', kCarted: 'In the cart', hPhone: 'This phone', noRecent: 'Nothing yet.',
   nextCheck: 'Next check in {s} s', pausedSub: 'Press Resume to continue',
 });
+Object.assign(STR.en, {   // 2.3.0
+  huntingMatch: 'Hunting {m}', huntingAny: 'Hunting', clickingNow: 'Clicking tickets…', startingNow: 'Starting…', pausedNow: 'Hunting is paused',
+  limitLeft: '{n} more ticket(s) allowed', limitFull: 'Cart limit reached · not clicking more', hLatest: 'Latest', whatToHunt: 'What to hunt',
+  seatLine: 'Block {b} · Row {r} · Seat {s}', catNames: ['', 'Kategorie 1', 'Kategorie 2', 'Kategorie 3', 'Kategorie 4', 'Standing', 'Lounge'],
+  theme: 'Appearance', thLight: 'Light', thDark: 'Dark', thSystem: 'System',
+  dupWarn: 'This is the same as preset “{n}”. Save it anyway?', saveAnyway: 'Save anyway',
+});
 Object.assign(STR.en.errs, {
   errPreset: 'That preset isn\'t on the computer anymore', errPresetFull: 'There are already 8 presets', errPresetName: 'Give the preset a name of up to 30 characters',
   errPresetDup: 'There is already a preset with this name', errPresetValue: 'The preset\'s field isn\'t valid', errPinFull: 'Two presets are pinned already: unpin one first',
@@ -473,6 +517,13 @@ Object.assign(STR.hu, {
   statsNew: 'Új jelentés a számítógépen', statsHint: 'Az eddigi teljes időszak. A teljes jelentés a számítógépen nyílik meg.',
   kChecksAll: 'Ellenőrzések', kSeen: 'Talált jegyek', kClicked: 'Kattintás', kCarted: 'Kosárba került', hPhone: 'Ez a telefon', noRecent: 'Még nincs semmi.',
   nextCheck: 'Következő ellenőrzés {s} mp múlva', pausedSub: 'A folytatáshoz nyomd meg a Folytatás gombot',
+});
+Object.assign(STR.hu, {   // 2.3.0
+  huntingMatch: 'Keresés: {m}', huntingAny: 'Keresés', clickingNow: 'Kattintás a jegyekre…', startingNow: 'Indul…', pausedNow: 'A keresés szünetel',
+  limitLeft: 'Még {n} jegy tehető a kosárba', limitFull: 'Kosárlimit elérve · nincs több kattintás', hLatest: 'Legutóbb', whatToHunt: 'Mit keres',
+  seatLine: '{b}. szektor · {r}. sor · {s}. szék', catNames: ['', 'Kategorie 1', 'Kategorie 2', 'Kategorie 3', 'Kategorie 4', 'Állóhely', 'Páholy'],
+  theme: 'Megjelenés', thLight: 'Világos', thDark: 'Sötét', thSystem: 'Rendszer',
+  dupWarn: 'Ez ugyanaz, mint a(z) „{n}” előbeállítás. Mégis menti?', saveAnyway: 'Mentés mégis',
 });
 Object.assign(STR.hu.errs, {
   errPreset: 'Ez az előbeállítás már nincs a gépen', errPresetFull: 'Már 8 előbeállítás van', errPresetName: 'Adj az előbeállításnak legfeljebb 30 karakteres nevet',
@@ -633,12 +684,26 @@ function suggest(mode, value) {
   if (!taken.has(base.toLowerCase())) return base;
   for (let n = 2; ; n++) { const t = cutName(base.slice(0, 27)) + ' ' + n; if (!taken.has(t.toLowerCase())) return t; }
 }
+let dupOk = null;   // the duplicate the user already confirmed ("Save anyway")
+function dupCheck(errEl, btn, mode, value, id) {
+  const d = presetList().find(p => p.id !== id && sameP(p, { mode, value })), sig = JSON.stringify([mode, value, id]);
+  if (!d || dupOk === sig) return true;
+  dupOk = sig; errEl.textContent = fmt(T.dupWarn, { n: d.name }); errEl.classList.remove('hidden'); btn.textContent = T.saveAnyway;
+  return false;
+}
 function nameProblem(name, id) {
   const n = String(name || '').trim();
   if (!n || n.length > 30) return T.errPName;
   if (presetList().some(p => p.id !== id && p.name.toLowerCase() === n.toLowerCase())) return T.errPDup;
   return '';
 }
+const ICO = {
+  person: '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+  check: '<svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ok)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  cart: '<svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18l-2 11H5L3 9z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>',
+  pause: '<svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>',
+  play: '<svg class="ico" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg>',
+};
 const PIN = (on, c) => `<svg width="14" height="14" viewBox="0 0 24 24" fill="${on ? c : 'none'}" stroke="${c}" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6 4 3v2H6v-2l4-3-1-6z"/><path d="M12 14v7" fill="none" stroke-linecap="round"/></svg>`;
 
 function staticTexts() {
@@ -648,8 +713,9 @@ function staticTexts() {
   $('lPaste').textContent = T.paste; $('pairBtn').textContent = T.pairBtn; $('ePaste').textContent = T.badLink; $('installTip').textContent = T.installTip;
   $('match').setAttribute('aria-label', T.match);
   $('ltStatus').textContent = T.tStatus; $('ltCart').textContent = T.tCart; $('ltSettings').textContent = T.tSettings; $('ltMore').textContent = T.tMore;
-  $('kMode').textContent = T.mode; $('kPage').textContent = T.page; $('kLast').textContent = T.lastCheck;
-  $('kRefresh').textContent = T.refreshLbl; $('kListed').textContent = T.listed; $('kChecks').textContent = T.checksToday;
+  $('kMode').textContent = T.whatToHunt; $('kLast').textContent = T.lastCheck; $('hLatest').textContent = T.hLatest;
+  $('lTheme').textContent = T.theme; $('thLight').textContent = T.thLight; $('thDark').textContent = T.thDark; $('thSystem').textContent = T.thSystem;
+  $('kRefresh').textContent = T.refreshLbl; $('kListed').textContent = T.listed;
   $('hPreset').textContent = T.preset; $('checkout').textContent = T.checkout; $('hunt').textContent = T.hunt;
   $('cYes').textContent = T.switchYes; $('cNo').textContent = T.cancel;
   $('hAccount').textContent = T.hAccount; $('hAccounts').textContent = T.accHint; $('lfRelogin').textContent = T.fRelogin;
@@ -672,6 +738,14 @@ function staticTexts() {
   if (cur) $('fMode').value = cur;
 }
 
+// ---------- appearance (2.3.0): Light / Dark / System, stored on this phone only ----------
+const theme = () => { const t = localStorage.getItem('rp_theme'); return t === 'light' || t === 'dark' ? t : 'system'; };
+function setTheme(t) {
+  if (t === 'system') { localStorage.removeItem('rp_theme'); document.documentElement.removeAttribute('data-theme'); }
+  else { localStorage.setItem('rp_theme', t); document.documentElement.setAttribute('data-theme', t); }
+  render();
+}
+
 // ---------- tabs; Presets is a screen over Status or Settings ----------
 let view = 'status', presetsFrom = null;
 const VIEWS = { status: 'vStatus', cart: 'vCart', settings: 'vSettings', more: 'vMore', presets: 'vPresets' };
@@ -682,7 +756,7 @@ function showView(next) {
   for (const [k, id] of Object.entries(VIEWS)) $(id).classList.toggle('hidden', k !== view);
   const tabOf = view === 'presets' ? presetsFrom : view;
   [['status', 'tabStatus'], ['cart', 'tabCart'], ['settings', 'tabSettings'], ['more', 'tabMore']].forEach(([k, id]) => $(id).setAttribute('aria-selected', String(k === tabOf)));
-  window.scrollTo(0, 0);
+  $('scroller').scrollTop = 0;
   render();
 }
 function openPresets(seedNew) {
@@ -698,6 +772,7 @@ function render() {
   $('unpaired').classList.toggle('hidden', paired);
   $('installTip').classList.toggle('hidden', !(paired && justPaired && !standalone));
   $('app').classList.toggle('hidden', !paired);
+  $('tabbar').classList.toggle('hidden', !paired);
   const online = st && (Date.now() + offset - st.t) < ONLINE_MS;
   $('online').className = 'pill ' + (!st ? 'wait' : online ? 'on' : 'off');
   $('onlineText').textContent = !st ? T.connecting : online ? T.online : T.offline;
@@ -714,10 +789,16 @@ function render() {
   // status
   const h = st.hunt;
   const status = st.paused ? 'paused' : (st.hold ? 'hold' : h.status);
-  $('state').className = 'big ' + status;
-  $('stateText').textContent = { hunting: T.stHunting, paused: T.stPaused, clicking: T.stClicking, starting: T.stStarting, away: T.stAway, hold: T.stHold }[status] || status;
-  $('navMsg').textContent = st.page === 'tickets' ? '' : ((st.nav.msg || {})[lang] || '');
-  if (st.paused && st.page === 'tickets') $('navMsg').textContent = T.pausedSub;
+  $('state').className = 'statusline ' + status;
+  const navText = (st.nav.msg || {})[lang] || '';
+  const match = String(st.match.open || '').replace(/\s+/g, ' ').replace(/^FC Bayern München\s*[-–]\s*/i, '');
+  let big, sub = '';
+  if (st.paused) { big = T.pausedNow; sub = st.page === 'tickets' ? T.pausedSub : navText; }
+  else if (st.hold) { big = T.stHold; sub = navText; }
+  else if (st.page === 'tickets') { big = status === 'clicking' ? T.clickingNow : status === 'starting' ? T.startingNow : (match ? fmt(T.huntingMatch, { m: match }) : T.huntingAny); sub = huntSub(); }
+  else { big = navText || T.stAway; }
+  $('stateText').textContent = big;
+  $('navMsg').textContent = sub;
   $('stuck').classList.toggle('hidden', !st.nav.stuck);
   if (st.nav.stuck) $('stuck').textContent = fmt(T.stuck, { t: clock(st.nav.stuck.since - offset) });
   if (!online) { $('navMsg').textContent = T.offlineHint; }
@@ -725,25 +806,30 @@ function render() {
   const sec = n => String(+Number(n).toFixed(1)).replace('.', lang === 'hu' ? ',' : '.');
   const lo = Math.max(0, (h.refresh || 0) - (h.jitter || 0)), hi = (h.refresh || 0) + (h.jitter || 0);
   $('vRefresh').textContent = !h.refresh ? T.dash : (h.jitter ? fmt(T.refreshEvery, { a: sec(lo), b: sec(hi) }) : fmt(T.refreshEach, { a: sec(h.refresh) }));
-  $('vPage').textContent = T.pages[st.page] || st.page;
   $('vLast').textContent = clock(h.lastCheck ? h.lastCheck - offset : 0);
   $('vListed').textContent = h.listed == null ? T.dash : h.listed === 0 ? T.listedNone : fmt(T.listedValue, { n: h.listed, m: h.matching });
-  $('vChecks').textContent = h.checksToday;
-  $('toggle').textContent = st.paused ? '▶ ' + T.resume : '⏸ ' + T.pause;
+  $('toggle').innerHTML = st.paused ? `${ICO.play}<span>${esc(T.resume)}</span>` : `${ICO.pause}<span>${esc(T.pause)}</span>`;
   $('toggle').className = st.paused ? 'primary' : '';
   renderPresetChips();
   tick();
 
   // cart
   const c = st.cart;
-  $('hCart').textContent = `${T.cart}: ${c.count ? fmt(T.cartCount, { n: c.count }) : T.cartEmpty}`;
+  $('hCart').textContent = c.count ? fmt(T.stripN, { n: c.count }) : T.stripEmpty;
+  const lim = h.limit;
+  $('cartLimit').classList.toggle('hidden', lim == null);
+  $('cartLimit').textContent = lim === 0 ? T.limitFull : lim ? fmt(T.limitLeft, { n: lim }) : '';
   $('cartBadge').textContent = c.count || '';
   $('cartBadge').classList.toggle('hidden', !c.count);
   $('cartTask').classList.toggle('hidden', !c.task);
   if (c.task) $('cartTask').textContent = c.task.action === 'remove' ? fmt(T.taskRemove, { t: c.task.label }) : T.taskRemoveAll;
   $('items').innerHTML = (c.count ? c.items : []).map((i, n) => {
     const sure = armed === 'rm:' + i.key;
-    return `<div class="item"><span><b>${n + 1}</b> · ${esc(i.seatInfo)} <span class="p">· ${esc(i.price)}</span></span>
+    const m = String(i.seatInfo).match(/Block\s*([^,]+),\s*Row\s*([^,]+),\s*Seat\s*(.+)/i);
+    const block = m ? m[1].trim() : '', shape = STADIUM.find(b => b[0] === block && !b[2]) || STADIUM.find(b => b[0] === block);
+    const line = m ? fmt(T.seatLine, { b: block, r: m[2].trim(), s: m[3].trim() }) : i.seatInfo;
+    const meta = [shape ? T.catNames[shape[1]] : '', i.price || ''].filter(Boolean).join(' · ');
+    return `<div class="citem"><span class="num">${n + 1}</span><span class="txt">${esc(line)}${meta ? `<div class="meta">${esc(meta)}</div>` : ''}</span>
       <button class="small danger${sure ? ' sure' : ''}" data-key="${esc(i.key)}" type="button">${sure ? T.sure : T.remove}</button></div>`;
   }).join('');
   $('items').querySelectorAll('[data-key]').forEach(b => {
@@ -762,6 +848,9 @@ function render() {
   const ev = st.events || [];
   $('events').innerHTML = ev.length ? ev.map(e => `<div class="ev"><time>${clock(e.at - offset)}</time><span>${esc(e[lang] || e.en)}</span></div>`).join('') : `<div class="ev">${esc(T.noRecent)}</div>`;
   $('moreDot').classList.toggle('hidden', !(st.stats && st.stats.newReport));
+  $('latestCard').classList.toggle('hidden', !ev.length);
+  $('latest').innerHTML = ev.length ? `<div class="ev"><time>${clock(ev[0].at - offset)}</time><span>${esc(ev[0][lang] || ev[0].en)}</span></div>` : '';
+  ['Light', 'Dark', 'System'].forEach(k => $('th' + k).setAttribute('aria-pressed', String(theme() === k.toLowerCase())));
 
   if (view === 'presets' && !presetEdit) renderPresets();
 }
@@ -771,9 +860,9 @@ function renderAccount() {
   const pill = $('accPill');
   pill.className = 'acc ' + a.kind;
   if (a.kind === 'none') { pill.textContent = T.accNone; pill.title = T.accTip.none; pill.setAttribute('aria-label', pill.title); return; }
-  const stx = a.kind === 'ok' ? '<span class="ck" aria-hidden="true">✓</span>' : a.kind === 'login' ? `<span class="st">${esc(T.accLoggingIn)}</span>`
+  const stx = a.kind === 'ok' ? ICO.check : a.kind === 'login' ? `<span class="st">${esc(T.accLoggingIn)}</span>`
     : a.kind === 'out' ? `<span class="st">${esc(T.accLoggedOut)}</span>` : a.kind === 'wrong' ? `<span class="st">${esc(a.who || '')}</span>` : '';
-  pill.innerHTML = `<span aria-hidden="true">👤</span><span class="nm">${esc(a.name || st.account)}</span>${stx}`;
+  pill.innerHTML = `${ICO.person}<span class="nm">${esc(a.name || st.account)}</span>${stx}`;
   pill.title = fmt(T.accTip[a.kind] || '', { n: a.name || st.account, w: a.who || '' });
   pill.setAttribute('aria-label', pill.title);
 }
@@ -801,7 +890,7 @@ function renderStrip() {
   const show = (view === 'status' || view === 'more') && c.count != null;
   strip.classList.toggle('hidden', !show);
   if (!show) return;
-  if (!c.count) { strip.className = 'strip empty'; strip.textContent = '🛒 ' + T.stripEmpty; return; }
+  if (!c.count) { strip.className = 'strip empty'; strip.innerHTML = `${ICO.cart}<span>${esc(T.stripEmpty)}</span>`; return; }
   strip.className = 'strip full';
   const tag = (i, n) => { const m = String(i.seatInfo).match(/Block\s*([^,]+),\s*Row\s*([^,]+),\s*Seat\s*(.+)/i); const pr = String(i.price || '').replace(/,00\b/, '');
     return `<span class="tag">${n + 1} · ${esc(m ? `Block ${m[1].trim()} · R${m[2].trim()} · S${m[3].trim()}` : i.seatInfo)}${pr ? ' · ' + esc(pr) : ''}</span>`; };
@@ -845,12 +934,15 @@ function renderStats() {
   $('tClicked').textContent = num(s.totals.clicked); $('tCarted').textContent = num(s.totals.carted);
 }
 
+function huntSub() {
+  const parts = [], h = st.hunt;
+  if (!st.paused && !st.hold && h.nextReloadAt) parts.push(fmt(T.nextCheck, { s: Math.max(0, (h.nextReloadAt - (Date.now() + offset)) / 1000).toFixed(1).replace('.', lang === 'hu' ? ',' : '.') }));
+  if (h.limit === 0) parts.push(T.limitFull); else if (h.limit) parts.push(fmt(T.limitLeft, { n: h.limit }));
+  return parts.join(' · ');
+}
 function tick() {
-  if (!st || st.page !== 'tickets' || st.paused || st.hold) return;
-  const next = st.hunt.nextReloadAt;
-  if (!next) return;
-  const s = Math.max(0, (next - (Date.now() + offset)) / 1000);
-  if (Date.now() + offset - st.t < ONLINE_MS) $('navMsg').textContent = fmt(T.nextCheck, { s: s.toFixed(1).replace('.', lang === 'hu' ? ',' : '.') });
+  if (!st || st.page !== 'tickets' || st.paused || st.hold || ['clicking', 'starting'].includes(st.hunt.status)) return;
+  if (Date.now() + offset - st.t < ONLINE_MS) $('navMsg').textContent = huntSub();
 }
 
 // ================= settings =================
@@ -892,7 +984,7 @@ function renderAccChips() {
   const sig = JSON.stringify([st.accounts, st.account, lang]);
   if ($('accChips').dataset.sig === sig) return;
   $('accChips').dataset.sig = sig;
-  $('accChips').innerHTML = st.accounts.map(n => `<button type="button" class="chip" data-acc="${esc(n)}" aria-pressed="${n === st.account}">👤 ${esc(n)}${n === st.account && st.accountState && st.accountState.kind === 'ok' ? ' ✓' : ''}</button>`).join('');
+  $('accChips').innerHTML = st.accounts.map(n => `<button type="button" class="chip" data-acc="${esc(n)}" aria-pressed="${n === st.account}">${ICO.person} ${esc(n)}${n === st.account && st.accountState && st.accountState.kind === 'ok' ? ' ' + ICO.check : ''}</button>`).join('');
   $('accChips').querySelectorAll('[data-acc]').forEach(b => { b.onclick = () => askSwitch(b.dataset.acc); });
 }
 function askSwitch(to) {
@@ -900,7 +992,7 @@ function askSwitch(to) {
   const cart = st.cart.count || 0;
   $('confirmText').textContent = fmt(T.switchConfirm, { from: st.account || '?', to }) + (cart > 0 ? ' ' + fmt(T.switchCart, { n: cart, from: st.account || '?' }) : '');
   $('confirm').classList.remove('hidden');
-  window.scrollTo(0, 0);
+  $('scroller').scrollTop = 0;
   $('cYes').onclick = () => { $('confirm').classList.add('hidden'); send('account', { name: to }); };
   $('cNo').onclick = () => { $('confirm').classList.add('hidden'); };
 }
@@ -932,6 +1024,7 @@ function showNameRow() {
   $('psErr').textContent = full ? fmt(T.presetsFull, { m: presetMax() }) : ''; $('psErr').classList.toggle('hidden', !full);
   $('psSave').disabled = full;
   $('psName').value = suggest(cur.mode, cur.value);
+  $('psSave').textContent = T.savePreset; dupOk = null;
   $('psName').focus();
 }
 // Save (optionally with "update the active preset" or "save as a new preset"): one command, checked again by the computer
@@ -970,6 +1063,8 @@ function saveAsNew() {
   const name = $('psName').value.trim();
   const prob = presetList().length >= presetMax() ? fmt(T.presetsFull, { m: presetMax() }) : nameProblem(name, null);
   if (prob) { $('psErr').textContent = prob; $('psErr').classList.remove('hidden'); $('psName').focus(); return; }
+  const cur = formHunt();
+  if (!dupCheck($('psErr'), $('psSave'), cur.mode, cur.value, null)) return;
   saveSettings({ saveAs: name });
 }
 
@@ -1027,6 +1122,7 @@ function savePreset() {
   const prob = nameProblem(name, presetEdit.id)
     || (mode === 'price' && priceNum(value) === null ? T.errPrice : mode === 'blocks' && !value ? T.errBlocks : mode === 'adjacent' && !(parseInt(value, 10) >= 2) ? T.errSeats : '');
   if (prob) { $('pfErr').textContent = prob; $('pfErr').classList.remove('hidden'); return; }
+  if (!dupCheck($('pfErr'), $('pfSave'), mode, value, presetEdit.id)) return;
   if (presetEdit.id) send('presetEdit', { id: presetEdit.id, name, mode, value });
   else send('presetSave', { name, mode, value });
   presetEdit = null;
@@ -1042,6 +1138,7 @@ function wire() {
   };
   $('paste').oninput = () => $('ePaste').classList.add('hidden');
   $('tabStatus').onclick = () => showView('status');
+  $('thLight').onclick = () => setTheme('light'); $('thDark').onclick = () => setTheme('dark'); $('thSystem').onclick = () => setTheme('system');
   $('tabCart').onclick = () => showView('cart');
   $('tabSettings').onclick = () => showView('settings');
   $('tabMore').onclick = () => showView('more');
