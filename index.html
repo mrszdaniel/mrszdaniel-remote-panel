@@ -104,6 +104,68 @@ label > input, label > select { margin-top: 5px; }
 #skipList .item { font-size: 14px; }
 #skipList .why { color: var(--muted); }
 .hidden { display: none !important; }
+/* ---- 2.2.0: one structure with the panel: bar, cart strip, tabs at the bottom ---- */
+body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+.bar { background: var(--card); border-bottom: 1px solid var(--line); padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.bar select { flex: 1; min-width: 0; margin: 0; }
+.acc { all: unset; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--card); white-space: nowrap; max-width: 46%; font-size: 15px; -webkit-tap-highlight-color: transparent; }
+.acc .nm { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.acc .st { font-size: 13px; color: var(--muted); }
+.acc.ok .ck { color: var(--ok); font-weight: 700; }
+.acc.wrong { background: var(--bad-bg); border-color: var(--bad); } .acc.wrong .st { color: var(--bad); }
+.acc.out { background: var(--warn-bg); } .acc.out .st { color: var(--warn); }
+.acc.none { border-style: dashed; color: var(--muted); }
+.notebar { background: var(--warn-bg); color: var(--warn); font-size: 14px; padding: 8px 14px; border-bottom: 1px solid var(--line); }
+.strip { display: block; width: auto; margin: 12px 12px 0; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; font-size: 15px; }
+.strip.empty { color: var(--muted); }
+.strip.full { background: #fde8ec; border-color: #f3b5c1; color: #9a0420; }
+@media (prefers-color-scheme: dark) { .strip.full { background: #3d1d24; border-color: #6a2a37; color: #ffb3c1; } }
+.strip .top { display: flex; justify-content: space-between; font-weight: 600; } .strip .top span:last-child { font-weight: 400; color: var(--link); }
+.strip .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.strip .tag { background: var(--card); color: var(--ink); border-radius: 999px; padding: 2px 10px; font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { all: unset; cursor: pointer; font-size: 15px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--card); display: inline-flex; align-items: center; gap: 6px; -webkit-tap-highlight-color: transparent; }
+.chip[aria-pressed="true"] { border-color: var(--red); background: #fde8ec; color: #9a0420; font-weight: 600; }
+@media (prefers-color-scheme: dark) { .chip[aria-pressed="true"] { background: #3d1d24; color: #ffb3c1; } }
+.chip.changed { border-color: #e3a33b; background: var(--warn-bg); color: var(--warn); }
+.chip.dashed { border-style: dashed; color: var(--muted); }
+.chip svg { flex: none; }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--card); border-top: 1px solid var(--line);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.tabbar button { all: unset; cursor: pointer; min-height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font-size: 12px; color: var(--muted); position: relative; -webkit-tap-highlight-color: transparent; }
+.tabbar button[aria-selected="true"] { color: var(--red); font-weight: 600; }
+.tabbar .n { position: absolute; top: 2px; left: 54%; background: var(--red); color: #fff; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 0 6px; }
+.tabbar .dotr { position: absolute; top: 6px; left: 58%; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+.sec { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
+.inline { margin: 6px 0 0 32px; color: var(--muted); font-size: 15px; line-height: 2.6; }
+.inline input { display: inline-block; width: 74px; margin: 0 4px; vertical-align: middle; line-height: normal; }
+.indent { margin-left: 32px; }
+.ro { font-size: 15px; } .ro b { overflow-wrap: anywhere; }
+.presetbox { background: var(--warn-bg); color: var(--warn); border-radius: 10px; padding: 10px 12px; margin-top: 12px; font-size: 15px; }
+.presetbox .btns { margin-top: 8px; } .presetnow { color: var(--muted); font-size: 15px; margin-top: 10px; }
+.linkrow { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 12px; }
+.link { all: unset; cursor: pointer; color: var(--link); font-size: 16px; min-height: 32px; display: inline-flex; align-items: center; }
+.link:disabled { opacity: .45; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.tile { background: var(--soft); border-radius: 12px; padding: 10px 12px; } .tile .k { font-size: 13px; color: var(--muted); } .tile .v { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.newrep { color: #9a0420; font-size: 14px; margin-top: 4px; }
+@media (prefers-color-scheme: dark) { .newrep { color: #ffb3c1; } }
+.prow { border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; margin-top: 8px; background: var(--card); }
+.prow.on { border-color: var(--red); background: #fde8ec; }
+@media (prefers-color-scheme: dark) { .prow.on { background: #3d1d24; } }
+.prow .use { all: unset; cursor: pointer; display: block; width: 100%; min-height: 44px; }
+.prow .nm { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.prow .ds { font-size: 14px; color: var(--muted); }
+.prow .tag { font-size: 12px; font-weight: 700; color: #9a0420; background: #fff; border: 1px solid #f3b5c1; border-radius: 999px; padding: 0 8px; margin-right: 6px; }
+.prow .tag.ch { color: var(--warn); border-color: #e3a33b; }
+.prow .btns { margin-top: 8px; } .prow .btns button { flex: none; padding: 8px 14px; font-size: 15px; }
+.pform { border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-top: 8px; background: var(--card); }
+.back { all: unset; cursor: pointer; color: var(--link); font-size: 16px; min-height: 36px; display: inline-flex; align-items: center; }
+.toast { bottom: calc(82px + env(safe-area-inset-bottom, 0px)); }
+
 </style>
 </head>
 <body>
@@ -123,18 +185,19 @@ label > input, label > select { margin-top: 5px; }
 
 <!-- paired -->
 <div id="app" class="hidden">
-  <div class="ctx">
-    <span class="lbl" id="lAccount"></span><select id="acc"></select>
-    <span class="lbl" id="lMatch"></span><select id="match"></select>
-    <span class="note hidden" id="matchNote"></span>
+  <div class="bar">
+    <button class="acc" id="accPill" type="button"></button>
+    <select id="match" aria-label="Match"></select>
   </div>
+  <div class="notebar hidden" id="matchNote"></div>
   <div class="confirm hidden" id="confirm"><div id="confirmText"></div>
     <div class="btns"><button class="primary" id="cYes" type="button"></button><button id="cNo" type="button"></button></div>
   </div>
+  <button class="strip hidden" id="strip" type="button"></button>
 
-  <main id="mainView">
+  <!-- Status -->
+  <main id="vStatus">
     <section class="card">
-      <h2 id="hStatus"></h2>
       <div class="big" id="state"><span class="dot"></span><span id="stateText"></span></div>
       <div class="sub" id="navMsg"></div>
       <div class="banner bad hidden" id="stuck"></div>
@@ -142,13 +205,20 @@ label > input, label > select { margin-top: 5px; }
         <div class="row"><span class="k" id="kMode"></span><span class="v" id="vMode"></span></div>
         <div class="row"><span class="k" id="kPage"></span><span class="v" id="vPage"></span></div>
         <div class="row"><span class="k" id="kLast"></span><span class="v" id="vLast"></span></div>
-        <div class="row"><span class="k" id="kNext"></span><span class="v" id="vNext"></span></div>
         <div class="row"><span class="k" id="kListed"></span><span class="v" id="vListed"></span></div>
         <div class="row"><span class="k" id="kChecks"></span><span class="v" id="vChecks"></span></div>
+        <div class="row"><span class="k" id="kRefresh"></span><span class="v" id="vRefresh"></span></div>
       </div>
-      <div class="btns"><button id="toggle" type="button"></button><button id="openSettings" type="button"></button></div>
     </section>
+    <section class="card">
+      <h2 id="hPreset"></h2>
+      <div class="chips" id="presetChips"></div>
+    </section>
+    <div class="btns" style="margin-top:0"><button id="toggle" type="button"></button></div>
+  </main>
 
+  <!-- Cart -->
+  <main id="vCart" class="hidden">
     <section class="card">
       <h2 id="hCart"></h2>
       <div class="banner warn hidden" id="cartTask"></div>
@@ -160,57 +230,116 @@ label > input, label > select { margin-top: 5px; }
       <div class="row hidden" id="skipRow" style="align-items:center;margin-top:8px"><span class="k" id="skipText"></span><button class="small" id="skipToggle" type="button"></button></div>
       <div class="hidden" id="skipList"></div>
     </section>
-
-    <section class="card" id="recentCard">
-      <h2 id="hRecent"></h2>
-      <div id="events"></div>
-    </section>
   </main>
 
-  <main id="settingsView" class="hidden">
+  <!-- Settings -->
+  <main id="vSettings" class="hidden">
     <section class="card">
-      <h2 id="hSettings"></h2>
-      <label><span id="lfMode"></span><select id="fMode"></select></label>
+      <h2 id="hAccount"></h2>
+      <div class="chips" id="accChips"></div>
+      <div class="hint" id="hAccounts"></div>
+      <label class="check" style="margin-top:12px"><input type="checkbox" id="fRelogin"><span id="lfRelogin"></span></label>
+      <div class="inline" id="wRelogin"><span id="lReEvery"></span><input type="number" inputmode="numeric" min="15" max="600" step="1" id="fReloginMin">±<input type="number" inputmode="numeric" min="0" max="300" step="1" id="fReloginJit"><span id="lReMin"></span></div>
+      <div class="err hidden" id="eReloginMin"></div><div class="err hidden" id="eReloginJit"></div>
+    </section>
+    <section class="card">
+      <h2 id="hHunt"></h2>
+      <label style="margin-top:0"><span id="lfMode"></span><select id="fMode"></select></label>
       <div id="wPrice"><label><span id="lfPrice"></span><input type="text" inputmode="decimal" id="fPrice"></label><div class="err hidden" id="ePrice"></div></div>
       <div id="wBlocks"><label><span id="lfBlocks"></span><input type="text" id="fBlocks" autocapitalize="off" autocomplete="off"></label><div class="hint" id="hfBlocks"></div><div class="err hidden" id="eBlocks"></div></div>
       <div id="wSeats"><label><span id="lfSeats"></span><input type="number" inputmode="numeric" min="2" step="1" id="fSeats"></label><div class="err hidden" id="eSeats"></div></div>
+      <div id="presetBox"></div>
+      <div class="hidden" id="psRow">
+        <label><span id="lpsName"></span><input type="text" id="psName" maxlength="30" autocomplete="off"></label><div class="err hidden" id="psErr"></div>
+        <div class="btns"><button id="psCancel" type="button" style="flex:none"></button><button class="primary" id="psSave" type="button"></button></div>
+      </div>
+      <div class="linkrow"><button class="link" id="psAsPreset" type="button"></button><button class="link" id="psAll" type="button"></button></div>
+    </section>
+    <section class="card">
+      <h2 id="hTiming"></h2>
       <div class="pair">
-        <label><span id="lfRefresh"></span><input type="text" inputmode="decimal" id="fRefresh"></label>
-        <label><span id="lfJitter"></span><input type="text" inputmode="decimal" id="fJitter"></label>
+        <label style="margin-top:0"><span id="lfRefresh"></span><input type="text" inputmode="decimal" id="fRefresh"></label>
+        <label style="margin-top:0"><span id="lfJitter"></span><input type="text" inputmode="decimal" id="fJitter"></label>
       </div>
       <div class="err hidden" id="eRefresh"></div><div class="err hidden" id="eJitter"></div>
-      <div class="hint" id="hfRefresh"></div>
       <div class="pair">
         <label><span id="lfFail"></span><input type="number" inputmode="numeric" min="0" max="20" step="1" id="fFail"></label>
         <label><span id="lfFailMin"></span><input type="number" inputmode="numeric" min="1" max="1440" step="1" id="fFailMin"></label>
       </div>
       <div class="err hidden" id="eFail"></div><div class="err hidden" id="eFailMin"></div>
+      <div class="hint" id="hfRefresh"></div>
       <div class="hint" id="hfFail"></div>
-      <label class="check"><input type="checkbox" id="fSound"><span id="lfSound"></span></label>
-      <label class="check"><input type="checkbox" id="fNtfy"><span id="lfNtfy"></span></label>
+    </section>
+    <section class="card">
+      <h2 id="hNotify"></h2>
+      <label class="check" style="margin-top:0"><input type="checkbox" id="fNtfy"><span id="lfNtfy"></span></label>
+      <div class="indent" id="wTopic"><div class="ro" id="vTopic"></div><div class="hint" id="hTopic"></div></div>
       <label class="check"><input type="checkbox" id="fDesktop"><span id="lfDesktop"></span></label>
+      <label class="check"><input type="checkbox" id="fSound"><span id="lfSound"></span></label>
       <label class="check"><input type="checkbox" id="fStuck"><span id="lfStuck"></span></label>
-      <label><span id="lfStuckMin"></span><input type="number" inputmode="numeric" min="1" step="1" id="fStuckMin"></label>
+      <div class="inline" id="wStuck"><span id="lStuckAfter"></span><input type="number" inputmode="numeric" min="1" step="1" id="fStuckMin"><span id="lStuckTail"></span></div>
       <div class="err hidden" id="eStuckMin"></div>
-      <div class="btns"><button class="primary" id="save" type="button"></button><button id="cancel" type="button"></button></div>
+    </section>
+    <div class="btns" style="margin-top:0"><button id="cancel" type="button" style="flex:none"></button><button class="primary" id="save" type="button"></button></div>
+  </main>
+
+  <!-- More -->
+  <main id="vMore" class="hidden">
+    <section class="card">
+      <h2 id="hStats"></h2>
+      <div id="statsInfo"></div>
+      <div class="newrep hidden" id="statsNew"></div>
+      <div class="tiles hidden" id="statsTiles">
+        <div class="tile"><div class="k" id="kChecksAll"></div><div class="v" id="tChecks"></div></div>
+        <div class="tile"><div class="k" id="kSeen"></div><div class="v" id="tSeen"></div></div>
+        <div class="tile"><div class="k" id="kClicked"></div><div class="v" id="tClicked"></div></div>
+        <div class="tile"><div class="k" id="kCarted"></div><div class="v" id="tCarted"></div></div>
+      </div>
+      <div class="hint" id="hStatsHint"></div>
+    </section>
+    <section class="card" id="recentCard">
+      <h2 id="hRecent"></h2>
+      <div id="events"></div>
+    </section>
+    <section class="card">
+      <h2 id="hPhone"></h2>
+      <div class="sub" id="ver"></div>
+      <div class="sub" id="updated"></div>
+      <div class="btns"><button class="danger" id="unpair" type="button"></button></div>
     </section>
   </main>
 
-  <div class="foot"><span id="updated"></span><button id="unpair" type="button"></button><div id="ver" style="margin-top:4px"></div></div>
+  <!-- Presets (opened from Status or Settings) -->
+  <main id="vPresets" class="hidden">
+    <div><button class="back" id="presetsBack" type="button"></button></div>
+    <div class="big" style="font-size:22px" id="presetsTitle"></div>
+    <div class="hint" id="presetsHint"></div>
+    <div id="presetList"></div>
+    <div class="btns"><button id="presetSaveCurrent" type="button"></button></div>
+    <div class="hint" id="presetsLimit"></div>
+  </main>
+
+  <nav class="tabbar" role="tablist">
+    <button type="button" role="tab" id="tabStatus" aria-selected="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span id="ltStatus"></span></button>
+    <button type="button" role="tab" id="tabCart" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9h18l-2 11H5L3 9z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg><span class="n hidden" id="cartBadge"></span><span id="ltCart"></span></button>
+    <button type="button" role="tab" id="tabSettings" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span id="ltSettings"></span></button>
+    <button type="button" role="tab" id="tabMore" aria-selected="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg><span class="dotr hidden" id="moreDot"></span><span id="ltMore"></span></button>
+  </nav>
 </div>
 <div class="toast hidden" id="toast"></div>
+
 
 <script>
 (() => {
 'use strict';
 const DB_URL = 'https://remote-panel-c2375-default-rtdb.europe-west1.firebasedatabase.app';
-const PHONE_VERSION = '2.0.0';      // shown at the bottom, next to the computer's script version
+const PHONE_VERSION = '2.2.0';      // shown at the bottom, next to the computer's script version
 const ONLINE_MS = 40000;          // the computer reports at least every 15 s while this page is open
 
 // ================= texts =================
 const STR = {
   en: {
-    stHold: 'On hold',
+    stHold: 'On hold', refreshLbl: 'Refresh', refreshEvery: 'every {a}–{b} s', refreshEach: 'every {a} s',
     fFail: 'Skip after (failed clicks)', fFailMin: 'for (minutes)',
     fFailHint: 'A ticket that keeps failing is skipped for a while. Two site error pages also skip it. 0 turns this off.',
     errFail: 'Enter 0 to 20', errFailMin: 'Enter 1 to 1440 minutes',
@@ -249,7 +378,7 @@ const STR = {
     offlineHint: 'The computer isn\'t reporting. Is it on, with an FC Bayern page open?',
   },
   hu: {
-    stHold: 'Várakoztatva',
+    stHold: 'Várakoztatva', refreshLbl: 'Frissítés', refreshEvery: '{a}–{b} mp-enként', refreshEach: '{a} mp-enként',
     fFail: 'Kihagyás ennyi sikertelen kattintás után', fFailMin: 'ennyi percre',
     fFailHint: 'Az újra és újra sikertelen jegyet egy időre kihagyja. Két oldalhiba szintén kihagyást okoz. 0 esetén kikapcsolva.',
     errFail: '0 és 20 között adj meg', errFailMin: '1 és 1440 perc között adj meg',
@@ -288,6 +417,68 @@ const STR = {
     offlineHint: 'A gép nem jelentkezik. Be van kapcsolva, és nyitva van egy FC Bayern oldal?',
   },
 };
+// ---- 2.2.0: texts for the new structure (added to the ones above) ----
+Object.assign(STR.en, {
+  upText: 'On the computer, open the panel, go to More → "Pair a phone or make a new key…", and scan the code with the iPhone camera.',
+  tStatus: 'Status', tCart: 'Cart', tSettings: 'Settings', tMore: 'More',
+  stripN: '{n} ticket(s) in the cart', stripEmpty: 'Cart empty', stripView: 'View',
+  accLoggingIn: 'logging in…', accLoggedOut: 'logged out', accNone: 'No account',
+  accTip: { ok: '{n} is logged in.', unconfirmed: '{n} is logged in. The account is not confirmed yet.', wrong: '{w} is logged in instead of {n}.',
+            out: 'Nobody is logged in. {n} logs in next.', login: 'Logging in as {n}.', selected: '{n} is selected.', none: 'No accounts saved on the computer.' },
+  accHint: 'Choosing another account asks first and switches right away. Add or change accounts on the computer.',
+  fRelogin: 'Keep the login fresh', reEvery: 'every', reMinutes: 'minutes', errReloginMin: 'Enter 15 to 600 minutes', errReloginJit: 'Enter 0 or more, smaller than the minutes',
+  hHunt: 'What to hunt', hTiming: 'Timing', hNotify: 'Notifications', hAccount: 'Account',
+  fFailShort: 'Skip after (failed)', topicIs: 'Topic: {t}', topicNone: 'No topic set', topicHint: 'Change it on the computer.',
+  fNtfyShort: 'Phone (ntfy)', fDesktopShort: 'Desktop', stuckAfter: 'after', stuckTail: 'minutes', saveApply: 'Save and apply',
+  timingHint: 'Refreshes every {a}–{b} s. Faster refreshing is more noticeable to the site.',
+  preset: 'Preset', allPresets: 'All presets ({n})', saveAsPresetChip: '+ Save as preset', changed: 'changed', active: 'Active',
+  changedFrom: 'Changed from preset {n}', presetNow: 'Preset: {n}', updatePreset: 'Update preset', saveAsNew: 'Save as new…', saveAsPreset: 'Save as preset…',
+  pName: 'Name', savePreset: 'Save preset', editPreset: 'Edit preset', newPreset: 'New preset',
+  presetsTitle: 'Presets · {n} of {m}', presetsHint: 'Tap a preset to use it. Pin up to 2 to show them on Status.', noPresets: 'No presets yet.',
+  presetsLimit: 'Up to {m} presets. A preset stores the mode and its field (price, blocks or seats).', presetsFull: 'You have {m} presets. Delete one to save another.',
+  pin: 'Pin', pinned: 'Pinned', pinFull: 'Unpin one first', edit: 'Edit', del: 'Delete', saveCurrent: '+ Save current settings as a preset',
+  errPName: 'Give it a name of up to 30 characters.', errPDup: 'There is already a preset with this name.',
+  sugBlocks: 'Blocks {b}', sugSeats: '{n} together', back: 'Back',
+  hStats: 'Statistics', statsRun: 'Collecting: day {d} of {n}, until {t}.', statsEnd: 'Last period: {a} – {b}.', statsNone: 'No statistics period yet. Start one on the computer.',
+  statsNew: 'New report on the computer', statsHint: 'Whole period so far. The full report opens on the computer.',
+  kChecksAll: 'Checks', kSeen: 'Tickets found', kClicked: 'Clicked', kCarted: 'In the cart', hPhone: 'This phone', noRecent: 'Nothing yet.',
+  nextCheck: 'Next check in {s} s', pausedSub: 'Press Resume to continue',
+});
+Object.assign(STR.en.errs, {
+  errPreset: 'That preset isn\'t on the computer anymore', errPresetFull: 'There are already 8 presets', errPresetName: 'Give the preset a name of up to 30 characters',
+  errPresetDup: 'There is already a preset with this name', errPresetValue: 'The preset\'s field isn\'t valid', errPinFull: 'Two presets are pinned already: unpin one first',
+});
+Object.assign(STR.hu, {
+  upText: 'A számítógépen nyisd meg a panelt, válaszd a Továbbiak → „Telefon párosítása vagy új kulcs…” pontot, és olvasd be a kódot az iPhone kamerájával.',
+  tStatus: 'Állapot', tCart: 'Kosár', tSettings: 'Beállítások', tMore: 'Továbbiak',
+  stripN: '{n} jegy a kosárban', stripEmpty: 'A kosár üres', stripView: 'Megnézem',
+  accLoggingIn: 'bejelentkezés…', accLoggedOut: 'kijelentkezve', accNone: 'Nincs fiók',
+  accTip: { ok: '{n} van bejelentkezve.', unconfirmed: '{n} van bejelentkezve. A fiók még nincs megerősítve.', wrong: '{n} helyett {w} van bejelentkezve.',
+            out: 'Senki sincs bejelentkezve. Legközelebb {n} lép be.', login: 'Bejelentkezés ezzel: {n}.', selected: '{n} van kiválasztva.', none: 'A gépen nincs mentett fiók.' },
+  accHint: 'Másik fiók választásakor előbb rákérdez, majd azonnal vált. Fiókot a számítógépen adhatsz hozzá vagy módosíthatsz.',
+  fRelogin: 'Friss bejelentkezés', reEvery: '', reMinutes: 'percenként', errReloginMin: '15 és 600 perc között adj meg', errReloginJit: 'Adj meg 0 vagy nagyobb, a percnél kisebb értéket',
+  hHunt: 'Mit keressen', hTiming: 'Időzítés', hNotify: 'Értesítések', hAccount: 'Fiók',
+  fFailShort: 'Kihagyás (sikertelen)', topicIs: 'Téma: {t}', topicNone: 'Nincs megadott téma', topicHint: 'A számítógépen módosíthatod.',
+  fNtfyShort: 'Telefon (ntfy)', fDesktopShort: 'Asztali értesítés', stuckAfter: '', stuckTail: 'perc után', saveApply: 'Mentés és alkalmazás',
+  timingHint: '{a}–{b} mp-enként frissít. A gyakoribb frissítés feltűnőbb az oldalnak.',
+  preset: 'Előbeállítás', allPresets: 'Összes ({n})', saveAsPresetChip: '+ Mentés előbeállításként', changed: 'módosítva', active: 'Aktív',
+  changedFrom: 'Módosítva ehhez képest: {n}', presetNow: 'Előbeállítás: {n}', updatePreset: 'Előbeállítás frissítése', saveAsNew: 'Mentés újként…', saveAsPreset: 'Mentés előbeállításként…',
+  pName: 'Név', savePreset: 'Előbeállítás mentése', editPreset: 'Előbeállítás szerkesztése', newPreset: 'Új előbeállítás',
+  presetsTitle: 'Előbeállítások · {n} / {m}', presetsHint: 'Koppints egy előbeállításra a használatához. Legfeljebb 2 rögzíthető az Állapot fülre.', noPresets: 'Még nincs előbeállítás.',
+  presetsLimit: 'Legfeljebb {m} előbeállítás. Egy előbeállítás a módot és a hozzá tartozó mezőt tárolja (ár, szektorok vagy székek).', presetsFull: '{m} előbeállításod van. Törölj egyet, hogy újat menthess.',
+  pin: 'Rögzítés', pinned: 'Rögzítve', pinFull: 'Előbb oldj fel egyet', edit: 'Szerkesztés', del: 'Törlés', saveCurrent: '+ A mostani beállítások mentése előbeállításként',
+  errPName: 'Adj neki legfeljebb 30 karakteres nevet.', errPDup: 'Már van ilyen nevű előbeállítás.',
+  sugBlocks: '{b} szektor', sugSeats: '{n} egymás mellett', back: 'Vissza',
+  hStats: 'Statisztika', statsRun: 'Gyűjtés: {n} napból a {d}., {t}-ig.', statsEnd: 'Utolsó időszak: {a} – {b}.', statsNone: 'Még nincs statisztikai időszak. A számítógépen indíthatsz egyet.',
+  statsNew: 'Új jelentés a számítógépen', statsHint: 'Az eddigi teljes időszak. A teljes jelentés a számítógépen nyílik meg.',
+  kChecksAll: 'Ellenőrzések', kSeen: 'Talált jegyek', kClicked: 'Kattintás', kCarted: 'Kosárba került', hPhone: 'Ez a telefon', noRecent: 'Még nincs semmi.',
+  nextCheck: 'Következő ellenőrzés {s} mp múlva', pausedSub: 'A folytatáshoz nyomd meg a Folytatás gombot',
+});
+Object.assign(STR.hu.errs, {
+  errPreset: 'Ez az előbeállítás már nincs a gépen', errPresetFull: 'Már 8 előbeállítás van', errPresetName: 'Adj az előbeállításnak legfeljebb 30 karakteres nevet',
+  errPresetDup: 'Már van ilyen nevű előbeállítás', errPresetValue: 'Az előbeállítás mezője nem érvényes', errPinFull: 'Már 2 előbeállítás van rögzítve: előbb oldj fel egyet',
+});
+
 let lang = localStorage.getItem('rp_lang') || ((navigator.language || '').startsWith('hu') ? 'hu' : 'en');
 let T = STR[lang];
 const fmt = (s, v = {}) => String(s).replace(/\{(\w+)\}/g, (_, k) => (k in v ? v[k] : `{${k}}`));
@@ -425,28 +616,81 @@ function modeSummary(h) {
   if (h.mode === 'adjacent') return `${name}: ${h.seats}`;
   return name;
 }
+// presets: the same rules as the script (the computer checks again before storing anything)
+const FIELD = { price: 'price', blocks: 'blocks', adjacent: 'seats' };
+const valueOf = (mode, src) => { const f = FIELD[mode]; if (!f) return ''; const v = src[f]; return f === 'seats' ? String(parseInt(v, 10) || '') : String(v == null ? '' : v).trim(); };
+const describe = p => { const l = T.modes[p.mode] || p.mode; return p.mode === 'price' ? `${l}: ${p.value} €` : FIELD[p.mode] ? `${l}: ${p.value}` : l; };
+const priceNum = v => { const n = parseFloat(String(v).replace(/[^\d,.]/g, '').replace(',', '.')); return isNaN(n) ? null : n; };
+const normV = (mode, v) => mode === 'price' ? priceNum(v) : mode === 'blocks' ? String(v).replace(/\s+/g, '') : mode === 'adjacent' ? parseInt(v, 10) : '';
+const sameP = (a, b) => !!a && !!b && a.mode === b.mode && normV(a.mode, a.value) === normV(b.mode, b.value);
+const presetList = () => (st && st.presets && st.presets.list) || [];
+const presetMax = () => (st && st.presets && st.presets.max) || 8;
+const activePreset = () => presetList().find(p => p.id === (st && st.presets && st.presets.active)) || null;
+const cutName = t => (t.length > 30 ? t.slice(0, 29).trimEnd() + '…' : t);
+function suggest(mode, value) {
+  const base = cutName(mode === 'blocks' ? fmt(T.sugBlocks, { b: value }) : mode === 'price' ? `${value} €` : mode === 'adjacent' ? fmt(T.sugSeats, { n: value }) : (T.modes[mode] || mode));
+  const taken = new Set(presetList().map(p => p.name.toLowerCase()));
+  if (!taken.has(base.toLowerCase())) return base;
+  for (let n = 2; ; n++) { const t = cutName(base.slice(0, 27)) + ' ' + n; if (!taken.has(t.toLowerCase())) return t; }
+}
+function nameProblem(name, id) {
+  const n = String(name || '').trim();
+  if (!n || n.length > 30) return T.errPName;
+  if (presetList().some(p => p.id !== id && p.name.toLowerCase() === n.toLowerCase())) return T.errPDup;
+  return '';
+}
+const PIN = (on, c) => `<svg width="14" height="14" viewBox="0 0 24 24" fill="${on ? c : 'none'}" stroke="${c}" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6 4 3v2H6v-2l4-3-1-6z"/><path d="M12 14v7" fill="none" stroke-linecap="round"/></svg>`;
 
 function staticTexts() {
   document.documentElement.lang = lang;
   $('lang').textContent = T.lang;
   $('upTitle').textContent = T.upTitle; $('upText').textContent = T.upText;
   $('lPaste').textContent = T.paste; $('pairBtn').textContent = T.pairBtn; $('ePaste').textContent = T.badLink; $('installTip').textContent = T.installTip;
-  $('lAccount').textContent = T.account; $('lMatch').textContent = T.match;
-  $('hStatus').textContent = T.status; $('hCart').textContent = T.cart; $('hRecent').textContent = T.recent; $('hSettings').textContent = T.settings;
+  $('match').setAttribute('aria-label', T.match);
+  $('ltStatus').textContent = T.tStatus; $('ltCart').textContent = T.tCart; $('ltSettings').textContent = T.tSettings; $('ltMore').textContent = T.tMore;
   $('kMode').textContent = T.mode; $('kPage').textContent = T.page; $('kLast').textContent = T.lastCheck;
-  $('kNext').textContent = T.nextRefresh; $('kListed').textContent = T.listed; $('kChecks').textContent = T.checksToday;
-  $('openSettings').textContent = '⚙ ' + T.settings; $('checkout').textContent = T.checkout; $('hunt').textContent = T.hunt;
- $('cYes').textContent = T.switchYes; $('cNo').textContent = T.cancel;
+  $('kRefresh').textContent = T.refreshLbl; $('kListed').textContent = T.listed; $('kChecks').textContent = T.checksToday;
+  $('hPreset').textContent = T.preset; $('checkout').textContent = T.checkout; $('hunt').textContent = T.hunt;
+  $('cYes').textContent = T.switchYes; $('cNo').textContent = T.cancel;
+  $('hAccount').textContent = T.hAccount; $('hAccounts').textContent = T.accHint; $('lfRelogin').textContent = T.fRelogin;
+  $('lReEvery').textContent = T.reEvery; $('lReMin').textContent = T.reMinutes;
+  $('hHunt').textContent = T.hHunt; $('hTiming').textContent = T.hTiming; $('hNotify').textContent = T.hNotify;
   $('lfMode').textContent = T.fMode; $('lfPrice').textContent = T.fPrice; $('lfBlocks').textContent = T.fBlocks; $('hfBlocks').textContent = T.fBlocksHint;
-  $('lfSeats').textContent = T.fSeats; $('lfRefresh').textContent = T.fRefresh; $('lfJitter').textContent = T.fJitter; $('hfRefresh').textContent = T.fRefreshHint;
-  $('lfSound').textContent = T.fSound; $('lfNtfy').textContent = T.fNtfy; $('lfDesktop').textContent = T.fDesktop;
-  $('lfStuck').textContent = T.fStuck; $('lfStuckMin').textContent = T.fStuckMin;
-  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin', 'Fail', 'FailMin'].forEach(k => { $('e' + k).textContent = T['err' + k]; });
-  $('lfFail').textContent = T.fFail; $('lfFailMin').textContent = T.fFailMin; $('hfFail').textContent = T.fFailHint;
-  $('save').textContent = T.save; $('cancel').textContent = T.cancel;
+  $('lfSeats').textContent = T.fSeats; $('lfRefresh').textContent = T.fRefresh; $('lfJitter').textContent = T.fJitter;
+  $('lfFail').textContent = T.fFailShort; $('lfFailMin').textContent = T.fFailMin; $('hfFail').textContent = T.fFailHint;
+  $('lfSound').textContent = T.fSound; $('lfNtfy').textContent = T.fNtfyShort; $('lfDesktop').textContent = T.fDesktopShort; $('hTopic').textContent = T.topicHint;
+  $('lfStuck').textContent = T.fStuck; $('lStuckAfter').textContent = T.stuckAfter; $('lStuckTail').textContent = T.stuckTail;
+  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin', 'Fail', 'FailMin', 'ReloginMin', 'ReloginJit'].forEach(k => { $('e' + k).textContent = T['err' + k]; });
+  $('lpsName').textContent = T.pName; $('psSave').textContent = T.savePreset; $('psCancel').textContent = T.cancel; $('psAsPreset').textContent = T.saveAsPreset;
+  $('save').textContent = T.saveApply; $('cancel').textContent = T.cancel;
+  $('hStats').textContent = T.hStats; $('statsNew').textContent = T.statsNew; $('hStatsHint').textContent = T.statsHint;
+  $('kChecksAll').textContent = T.kChecksAll; $('kSeen').textContent = T.kSeen; $('kClicked').textContent = T.kClicked; $('kCarted').textContent = T.kCarted;
+  $('hRecent').textContent = T.recent; $('hPhone').textContent = T.hPhone;
+  $('presetsBack').textContent = '‹ ' + T.back; $('presetSaveCurrent').textContent = T.saveCurrent;
   const cur = $('fMode').value;
   $('fMode').innerHTML = Object.entries(T.modes).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join('');
   if (cur) $('fMode').value = cur;
+}
+
+// ---------- tabs; Presets is a screen over Status or Settings ----------
+let view = 'status', presetsFrom = null;
+const VIEWS = { status: 'vStatus', cart: 'vCart', settings: 'vSettings', more: 'vMore', presets: 'vPresets' };
+function showView(next) {
+  if (next === 'settings' && view !== 'settings' && view !== 'presets') openSettings();      // fresh from the computer each time; unsaved edits are dropped
+  if (view === 'presets' && next !== 'presets') presetEdit = null;
+  view = next;
+  for (const [k, id] of Object.entries(VIEWS)) $(id).classList.toggle('hidden', k !== view);
+  const tabOf = view === 'presets' ? presetsFrom : view;
+  [['status', 'tabStatus'], ['cart', 'tabCart'], ['settings', 'tabSettings'], ['more', 'tabMore']].forEach(([k, id]) => $(id).setAttribute('aria-selected', String(k === tabOf)));
+  window.scrollTo(0, 0);
+  render();
+}
+function openPresets(seedNew) {
+  presetsFrom = view === 'settings' ? 'settings' : 'status';
+  presetEdit = seedNew ? { id: null, mode: seedNew.mode, value: seedNew.value, name: suggest(seedNew.mode, seedNew.value) } : null;
+  presetDel = null;
+  showView('presets');
+  if (presetEdit) $('pfName') && $('pfName').focus();
 }
 
 function render() {
@@ -463,26 +707,9 @@ function render() {
   if (armed !== 'unpair') $('unpair').textContent = T.unpair;
   if (!st) return;
 
-  // account
-  const accSig = st.accounts.join('|') + '#' + st.account;
-  if ($('acc').dataset.sig !== accSig && $('confirm').classList.contains('hidden')) {
-    $('acc').innerHTML = st.accounts.map(n => `<option${n === st.account ? ' selected' : ''}>${esc(n)}</option>`).join('');
-    $('acc').dataset.sig = accSig;
-  }
-  // match
-  const items = st.matches || [];
-  const known = items.some(i => i.key === st.match.key);
-  const mSig = items.map(i => i.key).join('|') + '#' + st.match.key + '#' + st.match.text + '#' + lang;
-  if ($('match').dataset.sig !== mSig) {
-    $('match').innerHTML = [`<option value="">${esc(T.matchTop)}</option>`]
-      .concat(items.map(i => `<option value="${esc(i.key)}"${i.key === st.match.key ? ' selected' : ''}>${esc(shortName(i.name))} · ${esc(shortDate(i.date))}</option>`))
-      .join('');
-    $('match').dataset.sig = mSig;
-  }
-  const wanted = (items.find(i => i.key === st.match.key) || {}).name || st.match.text;
-  const differs = st.match.open && wanted && st.match.open.toLowerCase() !== wanted.toLowerCase();
-  $('matchNote').classList.toggle('hidden', !differs);
-  if (differs) $('matchNote').textContent = fmt(T.thisPage, { t: st.match.open });
+  renderAccount();
+  renderMatch();
+  renderStrip();
 
   // status
   const h = st.hunt;
@@ -490,26 +717,33 @@ function render() {
   $('state').className = 'big ' + status;
   $('stateText').textContent = { hunting: T.stHunting, paused: T.stPaused, clicking: T.stClicking, starting: T.stStarting, away: T.stAway, hold: T.stHold }[status] || status;
   $('navMsg').textContent = st.page === 'tickets' ? '' : ((st.nav.msg || {})[lang] || '');
+  if (st.paused && st.page === 'tickets') $('navMsg').textContent = T.pausedSub;
   $('stuck').classList.toggle('hidden', !st.nav.stuck);
   if (st.nav.stuck) $('stuck').textContent = fmt(T.stuck, { t: clock(st.nav.stuck.since - offset) });
   if (!online) { $('navMsg').textContent = T.offlineHint; }
   $('vMode').textContent = modeSummary(h);
+  const sec = n => String(+Number(n).toFixed(1)).replace('.', lang === 'hu' ? ',' : '.');
+  const lo = Math.max(0, (h.refresh || 0) - (h.jitter || 0)), hi = (h.refresh || 0) + (h.jitter || 0);
+  $('vRefresh').textContent = !h.refresh ? T.dash : (h.jitter ? fmt(T.refreshEvery, { a: sec(lo), b: sec(hi) }) : fmt(T.refreshEach, { a: sec(h.refresh) }));
   $('vPage').textContent = T.pages[st.page] || st.page;
   $('vLast').textContent = clock(h.lastCheck ? h.lastCheck - offset : 0);
   $('vListed').textContent = h.listed == null ? T.dash : h.listed === 0 ? T.listedNone : fmt(T.listedValue, { n: h.listed, m: h.matching });
   $('vChecks').textContent = h.checksToday;
   $('toggle').textContent = st.paused ? '▶ ' + T.resume : '⏸ ' + T.pause;
   $('toggle').className = st.paused ? 'primary' : '';
+  renderPresetChips();
   tick();
 
   // cart
   const c = st.cart;
   $('hCart').textContent = `${T.cart}: ${c.count ? fmt(T.cartCount, { n: c.count }) : T.cartEmpty}`;
+  $('cartBadge').textContent = c.count || '';
+  $('cartBadge').classList.toggle('hidden', !c.count);
   $('cartTask').classList.toggle('hidden', !c.task);
   if (c.task) $('cartTask').textContent = c.task.action === 'remove' ? fmt(T.taskRemove, { t: c.task.label }) : T.taskRemoveAll;
-  $('items').innerHTML = (c.count ? c.items : []).map(i => {
+  $('items').innerHTML = (c.count ? c.items : []).map((i, n) => {
     const sure = armed === 'rm:' + i.key;
-    return `<div class="item"><span>${esc(i.seatInfo)} <span class="p">· ${esc(i.price)}</span></span>
+    return `<div class="item"><span><b>${n + 1}</b> · ${esc(i.seatInfo)} <span class="p">· ${esc(i.price)}</span></span>
       <button class="small danger${sure ? ' sure' : ''}" data-key="${esc(i.key)}" type="button">${sure ? T.sure : T.remove}</button></div>`;
   }).join('');
   $('items').querySelectorAll('[data-key]').forEach(b => {
@@ -520,10 +754,325 @@ function render() {
   renderMap(c.count ? c.items : []);
   renderSkip(c.skippedList || []);
 
-  // recent
-  $('recentCard').classList.toggle('hidden', !(st.events || []).length);
-  $('events').innerHTML = (st.events || []).map(e => `<div class="ev"><time>${clock(e.at - offset)}</time><span>${esc(e[lang] || e.en)}</span></div>`).join('');
+  // settings: only what follows the computer live (the form itself is filled when the tab opens)
+  if (view === 'settings') { renderAccChips(); renderPresetBox(); }
+
+  // more
+  renderStats();
+  const ev = st.events || [];
+  $('events').innerHTML = ev.length ? ev.map(e => `<div class="ev"><time>${clock(e.at - offset)}</time><span>${esc(e[lang] || e.en)}</span></div>`).join('') : `<div class="ev">${esc(T.noRecent)}</div>`;
+  $('moreDot').classList.toggle('hidden', !(st.stats && st.stats.newReport));
+
+  if (view === 'presets' && !presetEdit) renderPresets();
 }
+
+function renderAccount() {
+  const a = st.accountState || { kind: st.accounts.length ? 'selected' : 'none', name: st.account };
+  const pill = $('accPill');
+  pill.className = 'acc ' + a.kind;
+  if (a.kind === 'none') { pill.textContent = T.accNone; pill.title = T.accTip.none; pill.setAttribute('aria-label', pill.title); return; }
+  const stx = a.kind === 'ok' ? '<span class="ck" aria-hidden="true">✓</span>' : a.kind === 'login' ? `<span class="st">${esc(T.accLoggingIn)}</span>`
+    : a.kind === 'out' ? `<span class="st">${esc(T.accLoggedOut)}</span>` : a.kind === 'wrong' ? `<span class="st">${esc(a.who || '')}</span>` : '';
+  pill.innerHTML = `<span aria-hidden="true">👤</span><span class="nm">${esc(a.name || st.account)}</span>${stx}`;
+  pill.title = fmt(T.accTip[a.kind] || '', { n: a.name || st.account, w: a.who || '' });
+  pill.setAttribute('aria-label', pill.title);
+}
+
+function renderMatch() {
+  const items = st.matches || [];
+  const mSig = items.map(i => i.key).join('|') + '#' + st.match.key + '#' + st.match.text + '#' + lang;
+  if ($('match').dataset.sig !== mSig) {
+    const known = items.some(i => i.key === st.match.key);
+    $('match').innerHTML = [`<option value="">${esc(T.matchTop)}</option>`]
+      .concat(items.map(i => `<option value="${esc(i.key)}"${i.key === st.match.key ? ' selected' : ''}>${esc(shortName(i.name))} · ${esc(shortDate(i.date))}</option>`))
+      .concat(!known && st.match.text ? [`<option value="__text" selected>${esc(fmt(T.matchText, { t: st.match.text }))}</option>`] : [])
+      .join('');
+    $('match').dataset.sig = mSig;
+  }
+  const wanted = (items.find(i => i.key === st.match.key) || {}).name || st.match.text;
+  const differs = st.match.open && wanted && st.match.open.toLowerCase() !== wanted.toLowerCase();
+  $('matchNote').classList.toggle('hidden', !differs);
+  if (differs) $('matchNote').textContent = fmt(T.thisPage, { t: st.match.open });
+}
+
+// the cart strip: on Status and More, like the panel
+function renderStrip() {
+  const c = st.cart, strip = $('strip');
+  const show = (view === 'status' || view === 'more') && c.count != null;
+  strip.classList.toggle('hidden', !show);
+  if (!show) return;
+  if (!c.count) { strip.className = 'strip empty'; strip.textContent = '🛒 ' + T.stripEmpty; return; }
+  strip.className = 'strip full';
+  const tag = (i, n) => { const m = String(i.seatInfo).match(/Block\s*([^,]+),\s*Row\s*([^,]+),\s*Seat\s*(.+)/i); const pr = String(i.price || '').replace(/,00\b/, '');
+    return `<span class="tag">${n + 1} · ${esc(m ? `Block ${m[1].trim()} · R${m[2].trim()} · S${m[3].trim()}` : i.seatInfo)}${pr ? ' · ' + esc(pr) : ''}</span>`; };
+  strip.innerHTML = `<div class="top"><span>${esc(fmt(T.stripN, { n: c.count }))}</span><span>${esc(T.stripView)}</span></div>`
+    + ((c.items || []).length ? `<div class="tags">${c.items.map(tag).join('')}</div>` : '');
+}
+
+// Status: pinned presets first, then the active one if it isn't pinned
+function renderPresetChips() {
+  const all = presetList(), act = activePreset(), changed = !!(st.presets && st.presets.changed);
+  const pinned = all.filter(p => p.pinned).sort((a, b) => a.pinnedAt - b.pinnedAt).slice(0, (st.presets && st.presets.maxPinned) || 2);
+  const list = act && !pinned.some(p => p.id === act.id) ? [...pinned, act] : pinned;
+  const sig = JSON.stringify([list, act && act.id, changed, all.length, lang]);
+  const box = $('presetChips');
+  if (box.dataset.sig === sig) return;
+  box.dataset.sig = sig;
+  box.innerHTML = list.map(p => {
+    const on = act && act.id === p.id, ch = on && changed;
+    return `<button type="button" class="chip${ch ? ' changed' : ''}" data-preset="${esc(p.id)}" aria-pressed="${!!on}" title="${esc(describe(p))}">${p.pinned ? PIN(true, 'currentColor') : ''}${esc(p.name)}${ch ? ' · ' + esc(T.changed) : ''}</button>`;
+  }).join('') + `<button type="button" class="chip dashed" id="allPresets">${esc(all.length ? fmt(T.allPresets, { n: all.length }) : T.saveAsPresetChip)}</button>`;
+  box.querySelectorAll('[data-preset]').forEach(b => { b.onclick = () => usePreset(b.dataset.preset); });
+  $('allPresets').onclick = () => (all.length ? openPresets() : openPresets(currentHunt()));
+}
+const currentHunt = () => ({ mode: st.hunt.mode, value: valueOf(st.hunt.mode, st.hunt) });
+function usePreset(id) {
+  const act = activePreset();
+  if (act && act.id === id && !(st.presets && st.presets.changed)) return;
+  send('presetUse', { id });
+}
+
+function renderStats() {
+  const s = st.stats;
+  const d = x => (x ? new Date(x + 'T12:00:00').toLocaleDateString(lang === 'hu' ? 'hu-HU' : 'en-GB', { day: 'numeric', month: 'short' }) : '');
+  $('statsInfo').textContent = !s ? T.statsNone : s.on ? fmt(T.statsRun, { d: s.day, n: s.n, t: d(s.last) }) : fmt(T.statsEnd, { a: d(s.start), b: d(s.last) });
+  $('statsNew').classList.toggle('hidden', !(s && s.newReport));
+  $('statsTiles').classList.toggle('hidden', !s);
+  $('hStatsHint').classList.toggle('hidden', !s);
+  if (!s) return;
+  const num = n => Number(n || 0).toLocaleString(lang === 'hu' ? 'hu-HU' : 'en-GB');
+  $('tChecks').textContent = num(s.totals.checks); $('tSeen').textContent = num(s.totals.seen);
+  $('tClicked').textContent = num(s.totals.clicked); $('tCarted').textContent = num(s.totals.carted);
+}
+
+function tick() {
+  if (!st || st.page !== 'tickets' || st.paused || st.hold) return;
+  const next = st.hunt.nextReloadAt;
+  if (!next) return;
+  const s = Math.max(0, (next - (Date.now() + offset)) / 1000);
+  if (Date.now() + offset - st.t < ONLINE_MS) $('navMsg').textContent = fmt(T.nextCheck, { s: s.toFixed(1).replace('.', lang === 'hu' ? ',' : '.') });
+}
+
+// ================= settings =================
+const parseNum = v => { const n = parseFloat(String(v).trim().replace(',', '.')); return isNaN(n) ? null : n; };
+const showNum = n => String(+Number(n).toFixed(2)).replace('.', lang === 'hu' ? ',' : '.');
+function showModeFields() {
+  const m = $('fMode').value;
+  $('wPrice').classList.toggle('hidden', m !== 'price');
+  $('wBlocks').classList.toggle('hidden', m !== 'blocks');
+  $('wSeats').classList.toggle('hidden', m !== 'adjacent');
+}
+function showSwitchFields() {
+  $('wRelogin').classList.toggle('hidden', !$('fRelogin').checked);
+  $('wTopic').classList.toggle('hidden', !$('fNtfy').checked);
+  $('wStuck').classList.toggle('hidden', !$('fStuck').checked);
+  if (!$('fRelogin').checked) { $('eReloginMin').classList.add('hidden'); $('eReloginJit').classList.add('hidden'); }
+  if (!$('fStuck').checked) $('eStuckMin').classList.add('hidden');
+}
+function timingHint() {
+  const r = parseNum($('fRefresh').value), j = parseNum($('fJitter').value);
+  $('hfRefresh').textContent = r !== null && j !== null && r >= 1 && j >= 0 && j < r ? fmt(T.timingHint, { a: showNum(Math.max(0.5, r - j)), b: showNum(r + j) }) : '';
+}
+function openSettings() {
+  if (!st) return;
+  const h = st.hunt, n = st.notify, re = st.relogin || { on: false, min: 60, jitter: 10 };
+  $('fMode').value = h.mode; $('fPrice').value = h.price; $('fBlocks').value = h.blocks; $('fSeats').value = h.seats;
+  $('fRefresh').value = showNum(h.refresh); $('fJitter').value = showNum(h.jitter);
+  $('fSound').checked = h.sound; $('fNtfy').checked = n.ntfy; $('fDesktop').checked = n.desktop;
+  $('fStuck').checked = n.stuck; $('fStuckMin').value = n.stuckMin;
+  $('fFail').value = h.failLimit ?? 3; $('fFailMin').value = h.failMinutes ?? 30;
+  $('fRelogin').checked = !!re.on; $('fReloginMin').value = re.min; $('fReloginJit').value = re.jitter;
+  $('vTopic').innerHTML = n.topic ? esc(fmt(T.topicIs, { t: '\u0001' })).replace('\u0001', `<b>${esc(n.topic)}</b>`) : esc(T.topicNone);
+  document.querySelectorAll('#vSettings .err').forEach(e => e.classList.add('hidden'));
+  $('psRow').classList.add('hidden');
+  showModeFields(); showSwitchFields(); timingHint();
+  $('confirm').classList.add('hidden');
+}
+function renderAccChips() {
+  const sig = JSON.stringify([st.accounts, st.account, lang]);
+  if ($('accChips').dataset.sig === sig) return;
+  $('accChips').dataset.sig = sig;
+  $('accChips').innerHTML = st.accounts.map(n => `<button type="button" class="chip" data-acc="${esc(n)}" aria-pressed="${n === st.account}">👤 ${esc(n)}${n === st.account && st.accountState && st.accountState.kind === 'ok' ? ' ✓' : ''}</button>`).join('');
+  $('accChips').querySelectorAll('[data-acc]').forEach(b => { b.onclick = () => askSwitch(b.dataset.acc); });
+}
+function askSwitch(to) {
+  if (!st || to === st.account) return;
+  const cart = st.cart.count || 0;
+  $('confirmText').textContent = fmt(T.switchConfirm, { from: st.account || '?', to }) + (cart > 0 ? ' ' + fmt(T.switchCart, { n: cart, from: st.account || '?' }) : '');
+  $('confirm').classList.remove('hidden');
+  window.scrollTo(0, 0);
+  $('cYes').onclick = () => { $('confirm').classList.add('hidden'); send('account', { name: to }); };
+  $('cNo').onclick = () => { $('confirm').classList.add('hidden'); };
+}
+const formHunt = () => { const mode = $('fMode').value; return { mode, value: valueOf(mode, { price: $('fPrice').value, blocks: $('fBlocks').value, seats: $('fSeats').value }) }; };
+function renderPresetBox() {
+  const a = activePreset(), cur = formHunt(), changed = !!a && !sameP(a, cur);
+  const box = $('presetBox');
+  const sig = JSON.stringify([a && a.id, a && a.name, changed, lang]);
+  if (box.dataset.sig !== sig) {
+    box.dataset.sig = sig;
+    if (changed) {
+      box.className = 'presetbox';
+      box.innerHTML = `<div>${esc(fmt(T.changedFrom, { n: '\u0001' })).replace('\u0001', `<b>${esc(a.name)}</b>`)}</div>`
+        + `<div class="btns"><button type="button" id="psUpdate">${esc(T.updatePreset)}</button><button type="button" id="psNew">${esc(T.saveAsNew)}</button></div>`;
+      $('psUpdate').onclick = () => saveSettings({ update: a.id });
+      $('psNew').onclick = () => showNameRow();
+    } else if (a) { box.className = 'presetnow'; box.textContent = fmt(T.presetNow, { n: a.name }); }
+    else { box.className = ''; box.textContent = ''; }
+  }
+  const full = presetList().length >= presetMax();
+  $('psAsPreset').classList.toggle('hidden', changed || !$('psRow').classList.contains('hidden'));
+  $('psAsPreset').disabled = full;
+  $('psAll').textContent = fmt(T.allPresets, { n: presetList().length });
+  $('psAll').classList.toggle('hidden', !presetList().length);
+}
+function showNameRow() {
+  const full = presetList().length >= presetMax(), cur = formHunt();
+  $('psRow').classList.remove('hidden'); $('psAsPreset').classList.add('hidden');
+  $('psErr').textContent = full ? fmt(T.presetsFull, { m: presetMax() }) : ''; $('psErr').classList.toggle('hidden', !full);
+  $('psSave').disabled = full;
+  $('psName').value = suggest(cur.mode, cur.value);
+  $('psName').focus();
+}
+// Save (optionally with "update the active preset" or "save as a new preset"): one command, checked again by the computer
+function saveSettings(preset) {
+  const mode = $('fMode').value, refresh = parseNum($('fRefresh').value), jitter = parseNum($('fJitter').value);
+  const seats = parseInt($('fSeats').value, 10), stuckMin = parseNum($('fStuckMin').value);
+  const failLimit = parseInt($('fFail').value, 10), failMinutes = parseInt($('fFailMin').value, 10);
+  const reOn = $('fRelogin').checked, reMin = parseInt($('fReloginMin').value, 10), reJit = parseInt($('fReloginJit').value, 10);
+  const errors = {
+    ReloginMin: reOn && !(reMin >= 15 && reMin <= 600),
+    ReloginJit: reOn && !(reJit >= 0 && reJit < reMin),
+    Price: mode === 'price' && parseNum(String($('fPrice').value).replace(/[^\d,.]/g, '')) === null,
+    Blocks: mode === 'blocks' && !$('fBlocks').value.trim(),
+    Seats: mode === 'adjacent' && !(seats >= 2),
+    Refresh: refresh === null || refresh < 1,
+    Jitter: jitter === null || jitter < 0 || (refresh !== null && jitter >= refresh),
+    Fail: !(failLimit >= 0 && failLimit <= 20),
+    FailMin: !(failMinutes >= 1 && failMinutes <= 1440),
+    StuckMin: $('fStuck').checked && !(stuckMin >= 1),
+  };
+  let first = null;
+  for (const [k, bad] of Object.entries(errors)) { $('e' + k).classList.toggle('hidden', !bad); if (bad && !first) first = $('f' + k); }
+  if (first) { first.focus(); return; }
+  const p = { mode, refresh, jitter, sound: $('fSound').checked, ntfy: $('fNtfy').checked, desktop: $('fDesktop').checked, stuck: $('fStuck').checked, reloginOn: reOn };
+  if (mode === 'price') p.price = $('fPrice').value.trim();
+  if (mode === 'blocks') p.blocks = $('fBlocks').value.trim();
+  if (mode === 'adjacent') p.seats = seats;
+  if (stuckMin >= 1) p.stuckMin = stuckMin;
+  if (reOn) { p.reloginMin = reMin; p.reloginJitter = reJit; }
+  p.failLimit = failLimit; p.failMinutes = failMinutes;
+  if (preset) p.preset = preset;
+  send('set', p);
+  showView('status');
+}
+function saveAsNew() {
+  const name = $('psName').value.trim();
+  const prob = presetList().length >= presetMax() ? fmt(T.presetsFull, { m: presetMax() }) : nameProblem(name, null);
+  if (prob) { $('psErr').textContent = prob; $('psErr').classList.remove('hidden'); $('psName').focus(); return; }
+  saveSettings({ saveAs: name });
+}
+
+// ================= presets screen =================
+let presetEdit = null, presetDel = null;
+function renderPresets() {
+  const all = presetList(), act = activePreset(), changed = !!(st.presets && st.presets.changed);
+  const pinnedN = all.filter(p => p.pinned).length, maxPin = (st.presets && st.presets.maxPinned) || 2, full = all.length >= presetMax();
+  $('presetsTitle').textContent = fmt(T.presetsTitle, { n: all.length, m: presetMax() });
+  $('presetsHint').textContent = all.length ? T.presetsHint : T.noPresets;
+  $('presetsLimit').textContent = full ? fmt(T.presetsFull, { m: presetMax() }) : fmt(T.presetsLimit, { m: presetMax() });
+  $('presetSaveCurrent').disabled = full || !!presetEdit;
+  const rows = all.map(p => {
+    if (presetEdit && presetEdit.id === p.id) return formHtml(presetEdit);
+    const on = act && act.id === p.id, canPin = p.pinned || pinnedN < maxPin;
+    const sure = presetDel === p.id;
+    return `<div class="prow${on ? ' on' : ''}">
+      <button type="button" class="use" data-use="${esc(p.id)}"><div class="nm">${esc(p.name)}</div><div class="ds">${on ? `<span class="tag">${esc(T.active)}</span>` : ''}${on && changed ? `<span class="tag ch">${esc(T.changed)}</span>` : ''}${esc(describe(p))}</div></button>
+      <div class="btns">
+        <button type="button" data-pin="${esc(p.id)}" aria-pressed="${!!p.pinned}"${canPin && !presetEdit ? '' : ' disabled'} title="${esc(canPin ? '' : T.pinFull)}">${PIN(!!p.pinned, 'currentColor')} ${esc(p.pinned ? T.pinned : T.pin)}</button>
+        <button type="button" data-edit="${esc(p.id)}"${presetEdit ? ' disabled' : ''}>${esc(T.edit)}</button>
+        <button type="button" class="danger${sure ? ' sure' : ''}" data-del="${esc(p.id)}"${presetEdit ? ' disabled' : ''}>${esc(sure ? T.sure : T.del)}</button>
+      </div></div>`;
+  }).join('');
+  $('presetList').innerHTML = rows + (presetEdit && !presetEdit.id ? formHtml(presetEdit) : '');
+  const L = $('presetList');
+  L.querySelectorAll('[data-use]').forEach(b => { b.onclick = () => { if (!presetEdit) usePreset(b.dataset.use); }; });
+  L.querySelectorAll('[data-pin]').forEach(b => { b.onclick = () => { const p = all.find(x => x.id === b.dataset.pin); if (p) send('presetPin', { id: p.id, on: !p.pinned }); }; });
+  L.querySelectorAll('[data-edit]').forEach(b => { b.onclick = () => { const p = all.find(x => x.id === b.dataset.edit); presetEdit = { id: p.id, name: p.name, mode: p.mode, value: p.value }; renderPresets(); $('pfName').focus(); }; });
+  L.querySelectorAll('[data-del]').forEach(b => {
+    b.onclick = () => {
+      const id = b.dataset.del;
+      if (presetDel !== id) { presetDel = id; renderPresets(); setTimeout(() => { if (presetDel === id) { presetDel = null; renderPresets(); } }, 4000); return; }
+      presetDel = null; send('presetDelete', { id }); renderPresets();
+    };
+  });
+  if (presetEdit) {
+    $('pfMode').onchange = () => { const m = $('pfMode').value; [['price', 'Price'], ['blocks', 'Blocks'], ['adjacent', 'Seats']].forEach(([k, id]) => $('pfW' + id).classList.toggle('hidden', m !== k)); };
+    $('pfCancel').onclick = () => { presetEdit = null; renderPresets(); };
+    $('pfSave').onclick = () => savePreset();
+  }
+}
+function formHtml(e) {
+  const row = (m, id, label, type, mode) => `<div id="pfW${id}" class="${e.mode === m ? '' : 'hidden'}"><label>${esc(label)}<input type="${type}" id="pf${id}"${mode ? ` inputmode="${mode}"` : ''} value="${esc(e.mode === m ? e.value : '')}"></label></div>`;
+  return `<div class="pform"><div style="font-weight:600">${esc(e.id ? T.editPreset : T.newPreset)}</div>
+    <label>${esc(T.pName)}<input type="text" id="pfName" maxlength="30" autocomplete="off" value="${esc(e.name)}"></label>
+    <label>${esc(T.fMode)}<select id="pfMode">${Object.entries(T.modes).map(([k, v]) => `<option value="${k}"${k === e.mode ? ' selected' : ''}>${esc(v)}</option>`).join('')}</select></label>
+    ${row('price', 'Price', T.fPrice, 'text', 'decimal')}${row('blocks', 'Blocks', T.fBlocks, 'text', '')}${row('adjacent', 'Seats', T.fSeats, 'number', 'numeric')}
+    <div class="err hidden" id="pfErr"></div>
+    <div class="btns"><button type="button" id="pfCancel" style="flex:none">${esc(T.cancel)}</button><button type="button" class="primary" id="pfSave">${esc(T.savePreset)}</button></div></div>`;
+}
+function savePreset() {
+  const mode = $('pfMode').value, name = $('pfName').value.trim();
+  const value = mode === 'price' ? $('pfPrice').value.trim() : mode === 'blocks' ? $('pfBlocks').value.trim() : mode === 'adjacent' ? $('pfSeats').value : '';
+  const prob = nameProblem(name, presetEdit.id)
+    || (mode === 'price' && priceNum(value) === null ? T.errPrice : mode === 'blocks' && !value ? T.errBlocks : mode === 'adjacent' && !(parseInt(value, 10) >= 2) ? T.errSeats : '');
+  if (prob) { $('pfErr').textContent = prob; $('pfErr').classList.remove('hidden'); return; }
+  if (presetEdit.id) send('presetEdit', { id: presetEdit.id, name, mode, value });
+  else send('presetSave', { name, mode, value });
+  presetEdit = null;
+  renderPresets();
+}
+
+// ================= wiring =================
+function wire() {
+  $('lang').onclick = () => { lang = lang === 'en' ? 'hu' : 'en'; T = STR[lang]; localStorage.setItem('rp_lang', lang); staticTexts(); ['match', 'presetChips', 'accChips', 'presetBox'].forEach(id => { $(id).dataset.sig = ''; }); render(); };
+  $('pairBtn').onclick = async () => {
+    if (!takeKey($('paste').value)) { $('ePaste').classList.remove('hidden'); return; }
+    $('paste').value = ''; await setup(); render(); listen(); fetchState(); hello();
+  };
+  $('paste').oninput = () => $('ePaste').classList.add('hidden');
+  $('tabStatus').onclick = () => showView('status');
+  $('tabCart').onclick = () => showView('cart');
+  $('tabSettings').onclick = () => showView('settings');
+  $('tabMore').onclick = () => showView('more');
+  $('strip').onclick = () => showView('cart');
+  $('accPill').onclick = () => showView('settings');
+  $('toggle').onclick = () => send(st && st.paused ? 'resume' : 'pause');
+  $('cancel').onclick = () => showView('status');
+  $('save').onclick = () => saveSettings(null);
+  $('fMode').onchange = () => { showModeFields(); renderPresetBox(); };
+  ['fRelogin', 'fNtfy', 'fStuck'].forEach(id => { $(id).onchange = showSwitchFields; });
+  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin', 'Fail', 'FailMin', 'ReloginMin', 'ReloginJit'].forEach(k => {
+    $('f' + k).oninput = () => { $('e' + k).classList.add('hidden'); if (k === 'Refresh' || k === 'Jitter') timingHint(); if (k === 'Price' || k === 'Blocks' || k === 'Seats') renderPresetBox(); };
+  });
+  $('psAsPreset').onclick = () => showNameRow();
+  $('psAll').onclick = () => openPresets();
+  $('psCancel').onclick = () => { $('psRow').classList.add('hidden'); renderPresetBox(); };
+  $('psSave').onclick = () => saveAsNew();
+  $('presetsBack').onclick = () => showView(presetsFrom || 'status');
+  $('presetSaveCurrent').onclick = () => { presetEdit = { id: null, ...currentHunt(), name: suggest(currentHunt().mode, currentHunt().value) }; renderPresets(); $('pfName').focus(); };
+  $('match').onchange = () => { const v = $('match').value; if (v !== '__text') send('match', { key: v }); };
+  $('removeAll').onclick = () => confirmTap($('removeAll'), 'all', T.removeAllSure, () => send('removeAll'));
+  $('checkout').onclick = () => send('checkout');
+  $('hunt').onclick = () => send('hunt');
+  $('skipToggle').onclick = () => { skipOpen = !skipOpen; render(); };
+  $('unpair').onclick = () => confirmTap($('unpair'), 'unpair', T.unpairSure, () => {
+    localStorage.removeItem('rp_key'); localStorage.removeItem('rp_state'); if (es) es.close(); ctx = null; st = null; justPaired = false;
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search); render();
+  });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && ctx) { hello(); fetchState(); } });
+}
+
 
 // Allianz Arena: [block, category (1-4, 5 standing, 6 lounge), extra piece of that block, label x, label y, label size, outline]
 const STADIUM = [
@@ -728,99 +1277,6 @@ function renderSkip(list) {
     + `<div class="btns"><button id="allowAll" type="button">${T.allowAll}</button></div>`;
   $('skipList').querySelectorAll('[data-allow]').forEach(b => { b.onclick = () => send('skipAllow', { key: b.dataset.allow }); });
   $('allowAll').onclick = () => { skipOpen = false; send('skipClear'); };
-}
-
-function tick() {
-  if (!st) return;
-  const next = st.hunt.nextReloadAt;
-  if (!next || st.paused) { $('vNext').textContent = T.dash; return; }
-  const s = Math.max(0, (next - (Date.now() + offset)) / 1000);
-  $('vNext').textContent = fmt(T.inS, { s: s.toFixed(1).replace('.', lang === 'hu' ? ',' : '.') });
-}
-
-// ================= settings form =================
-const parseNum = v => { const n = parseFloat(String(v).trim().replace(',', '.')); return isNaN(n) ? null : n; };
-const showNum = n => String(+Number(n).toFixed(2)).replace('.', lang === 'hu' ? ',' : '.');
-function showModeFields() {
-  const m = $('fMode').value;
-  $('wPrice').classList.toggle('hidden', m !== 'price');
-  $('wBlocks').classList.toggle('hidden', m !== 'blocks');
-  $('wSeats').classList.toggle('hidden', m !== 'adjacent');
-}
-function openSettings() {
-  if (!st) return;
-  const h = st.hunt, n = st.notify;
-  $('fMode').value = h.mode; $('fPrice').value = h.price; $('fBlocks').value = h.blocks; $('fSeats').value = h.seats;
-  $('fRefresh').value = showNum(h.refresh); $('fJitter').value = showNum(h.jitter);
-  $('fSound').checked = h.sound; $('fNtfy').checked = n.ntfy; $('fDesktop').checked = n.desktop;
-  $('fStuck').checked = n.stuck; $('fStuckMin').value = n.stuckMin;
-  $('fFail').value = h.failLimit ?? 3; $('fFailMin').value = h.failMinutes ?? 30;
-  document.querySelectorAll('.err').forEach(e => e.classList.add('hidden'));
-  showModeFields();
-  $('mainView').classList.add('hidden'); $('settingsView').classList.remove('hidden');
-  window.scrollTo(0, 0);
-}
-function closeSettings() { $('settingsView').classList.add('hidden'); $('mainView').classList.remove('hidden'); }
-function saveSettings() {
-  const mode = $('fMode').value, refresh = parseNum($('fRefresh').value), jitter = parseNum($('fJitter').value);
-  const seats = parseInt($('fSeats').value, 10), stuckMin = parseNum($('fStuckMin').value);
-  const failLimit = parseInt($('fFail').value, 10), failMinutes = parseInt($('fFailMin').value, 10);
-  const errors = {
-    Price: mode === 'price' && parseNum(String($('fPrice').value).replace(/[^\d,.]/g, '')) === null,
-    Blocks: mode === 'blocks' && !$('fBlocks').value.trim(),
-    Seats: mode === 'adjacent' && !(seats >= 2),
-    Refresh: refresh === null || refresh < 1,
-    Jitter: jitter === null || jitter < 0 || (refresh !== null && jitter >= refresh),
-    StuckMin: $('fStuck').checked && !(stuckMin >= 1),
-    Fail: !(failLimit >= 0 && failLimit <= 20),
-    FailMin: !(failMinutes >= 1 && failMinutes <= 1440),
-  };
-  let first = null;
-  for (const [k, bad] of Object.entries(errors)) { $('e' + k).classList.toggle('hidden', !bad); if (bad && !first) first = $('f' + k); }
-  if (first) { first.focus(); return; }
-  const p = { mode, refresh, jitter, sound: $('fSound').checked, ntfy: $('fNtfy').checked, desktop: $('fDesktop').checked, stuck: $('fStuck').checked };
-  if (mode === 'price') p.price = $('fPrice').value.trim();
-  if (mode === 'blocks') p.blocks = $('fBlocks').value.trim();
-  if (mode === 'adjacent') p.seats = seats;
-  if (stuckMin >= 1) p.stuckMin = stuckMin;
-  p.failLimit = failLimit; p.failMinutes = failMinutes;
-  send('set', p);
-  closeSettings();
-}
-
-// ================= wiring =================
-function wire() {
-  $('lang').onclick = () => { lang = lang === 'en' ? 'hu' : 'en'; T = STR[lang]; localStorage.setItem('rp_lang', lang); staticTexts(); $('match').dataset.sig = ''; render(); };
-  $('pairBtn').onclick = async () => {
-    if (!takeKey($('paste').value)) { $('ePaste').classList.remove('hidden'); return; }
-    $('paste').value = ''; await setup(); render(); listen(); fetchState(); hello();
-  };
-  $('paste').oninput = () => $('ePaste').classList.add('hidden');
-  $('toggle').onclick = () => send(st && st.paused ? 'resume' : 'pause');
-  $('openSettings').onclick = openSettings;
-  $('cancel').onclick = closeSettings;
-  $('save').onclick = saveSettings;
-  $('fMode').onchange = showModeFields;
-  ['Price', 'Blocks', 'Seats', 'Refresh', 'Jitter', 'StuckMin', 'Fail', 'FailMin'].forEach(k => { $('f' + k).oninput = () => $('e' + k).classList.add('hidden'); });
-  $('match').onchange = () => { const v = $('match').value; if (v !== '__text') send('match', { key: v }); };
-  $('acc').onchange = () => {
-    const to = $('acc').value;
-    if (!st || to === st.account) return;
-    const cart = st.cart.count || 0;
-    $('confirmText').textContent = fmt(T.switchConfirm, { from: st.account || '?', to }) + (cart > 0 ? ' ' + fmt(T.switchCart, { n: cart, from: st.account || '?' }) : '');
-    $('confirm').classList.remove('hidden');
-    $('cYes').onclick = () => { $('confirm').classList.add('hidden'); send('account', { name: to }); };
-    $('cNo').onclick = () => { $('confirm').classList.add('hidden'); $('acc').value = st.account; };
-  };
-  $('removeAll').onclick = () => confirmTap($('removeAll'), 'all', T.removeAllSure, () => send('removeAll'));
-  $('checkout').onclick = () => send('checkout');
-  $('hunt').onclick = () => send('hunt');
-  $('skipToggle').onclick = () => { skipOpen = !skipOpen; render(); };
-  $('unpair').onclick = () => confirmTap($('unpair'), 'unpair', T.unpairSure, () => {
-    localStorage.removeItem('rp_key'); localStorage.removeItem('rp_state'); if (es) es.close(); ctx = null; st = null; justPaired = false;
-    if (location.hash) history.replaceState(null, '', location.pathname + location.search); render();
-  });
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && ctx) { hello(); fetchState(); } });
 }
 
 async function main() {
