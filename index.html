@@ -312,6 +312,8 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
       <div class="err hidden" id="eFail"></div><div class="err hidden" id="eFailMin"></div>
       <div class="hint" id="hfRefresh"></div>
       <div class="hint" id="hfFail"></div>
+      <label class="check"><input type="checkbox" id="fBg"><span id="lfBg"></span></label>
+      <div class="hint" id="hfBg"></div>
     </section>
     <section class="card">
       <h2 id="hNotify"></h2>
@@ -382,7 +384,7 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 (() => {
 'use strict';
 const DB_URL = 'https://remote-panel-c2375-default-rtdb.europe-west1.firebasedatabase.app';
-const PHONE_VERSION = '2.4.0';      // shown at the bottom, next to the computer's script version
+const PHONE_VERSION = '2.5.0';      // shown at the bottom, next to the computer's script version
 const ONLINE_MS = 40000;          // the computer reports at least every 15 s while this page is open
 
 // ================= texts =================
@@ -497,6 +499,7 @@ Object.assign(STR.en, {   // 2.3.0
   huntingMatch: 'Hunting {m}', huntingAny: 'Hunting', clickingNow: 'Clicking tickets…', startingNow: 'Starting…', pausedNow: 'Hunting is paused',
   limitLeft: '{n} more ticket(s) allowed', limitFull: 'Cart limit reached · not clicking more', hLatest: 'Latest', whatToHunt: 'What to hunt',
   seatLine: 'Block {b} · Row {r} · Seat {s}', catNames: ['', 'Kategorie 1', 'Kategorie 2', 'Kategorie 3', 'Kategorie 4', 'Standing', 'Lounge'],
+  fBg: 'Check in the background', fBgHint: 'The ticket list is checked without reloading the page on the computer, and a match is clicked right away.', refreshBg: 'in the background',
   theme: 'Appearance', language: 'Language', stoppedNow: 'Stopped', thLight: 'Light', thDark: 'Dark', thSystem: 'System',
   dupWarn: 'This is the same as preset “{n}”. Save it anyway?', saveAnyway: 'Save anyway',
 });
@@ -534,6 +537,7 @@ Object.assign(STR.hu, {   // 2.3.0
   huntingMatch: 'Keresés: {m}', huntingAny: 'Keresés', clickingNow: 'Kattintás a jegyekre…', startingNow: 'Indul…', pausedNow: 'A keresés szünetel',
   limitLeft: 'Még {n} jegy tehető a kosárba', limitFull: 'Kosárlimit elérve · nincs több kattintás', hLatest: 'Legutóbb', whatToHunt: 'Mit keres',
   seatLine: '{b}. szektor · {r}. sor · {s}. szék', catNames: ['', 'Kategorie 1', 'Kategorie 2', 'Kategorie 3', 'Kategorie 4', 'Állóhely', 'Páholy'],
+  fBg: 'Ellenőrzés a háttérben', fBgHint: 'A jegylistát a számítógépen az oldal újratöltése nélkül ellenőrzi, és a találatra azonnal kattint.', refreshBg: 'a háttérben',
   theme: 'Megjelenés', language: 'Nyelv', stoppedNow: 'Leállt', thLight: 'Világos', thDark: 'Sötét', thSystem: 'Rendszer',
   dupWarn: 'Ez ugyanaz, mint a(z) „{n}” előbeállítás. Mégis menti?', saveAnyway: 'Mentés mégis',
 });
@@ -721,6 +725,7 @@ const PIN = (on, c) => `<svg width="14" height="14" viewBox="0 0 24 24" fill="${
 function staticTexts() {
   document.documentElement.lang = lang;
   $('lLang').textContent = T.language;
+  $('lfBg').textContent = T.fBg; $('hfBg').textContent = T.fBgHint;
   $('upTitle').textContent = T.upTitle; $('upText').textContent = T.upText;
   $('lPaste').textContent = T.paste; $('pairBtn').textContent = T.pairBtn; $('ePaste').textContent = T.badLink; $('installTip').textContent = T.installTip;
   $('match').setAttribute('aria-label', T.match);
@@ -821,6 +826,7 @@ function render() {
   const sec = n => String(+Number(n).toFixed(1)).replace('.', lang === 'hu' ? ',' : '.');
   const lo = Math.max(0, (h.refresh || 0) - (h.jitter || 0)), hi = (h.refresh || 0) + (h.jitter || 0);
   $('vRefresh').textContent = !h.refresh ? T.dash : (h.jitter ? fmt(T.refreshEvery, { a: sec(lo), b: sec(hi) }) : fmt(T.refreshEach, { a: sec(h.refresh) }));
+  if (h.refresh && h.bg) $('vRefresh').textContent += ' · ' + T.refreshBg;
   $('vLast').textContent = clock(h.lastCheck ? h.lastCheck - offset : 0);
   $('vListed').textContent = h.listed == null ? T.dash : h.listed === 0 ? T.listedNone : fmt(T.listedValue, { n: h.listed, m: h.matching });
   $('toggle').innerHTML = st.paused ? `${ICO.play}<span>${esc(T.resume)}</span>` : `${ICO.pause}<span>${esc(T.pause)}</span>`;
@@ -989,7 +995,8 @@ function openSettings() {
   $('fSound').checked = h.sound; $('fNtfy').checked = n.ntfy; $('fDesktop').checked = n.desktop;
   $('fStuck').checked = n.stuck; $('fStuckMin').value = n.stuckMin;
   $('fFail').value = h.failLimit ?? 3; $('fFailMin').value = h.failMinutes ?? 30;
-  $('fRelogin').checked = !!re.on; $('fReloginMin').value = re.min; $('fReloginJit').value = re.jitter;
+  $('fRelogin').checked = !!re.on;
+  $('fBg').checked = !!h.bg; $('fReloginMin').value = re.min; $('fReloginJit').value = re.jitter;
   $('vTopic').innerHTML = n.topic ? esc(fmt(T.topicIs, { t: '\u0001' })).replace('\u0001', `<b>${esc(n.topic)}</b>`) : esc(T.topicNone);
   document.querySelectorAll('#vSettings .err').forEach(e => e.classList.add('hidden'));
   $('psRow').classList.add('hidden');
@@ -1071,6 +1078,7 @@ function saveSettings(preset) {
   if (stuckMin >= 1) p.stuckMin = stuckMin;
   if (reOn) { p.reloginMin = reMin; p.reloginJitter = reJit; }
   p.failLimit = failLimit; p.failMinutes = failMinutes;
+  p.bgCheck = $('fBg').checked;
   if (preset) p.preset = preset;
   send('set', p);
   showView('status');
