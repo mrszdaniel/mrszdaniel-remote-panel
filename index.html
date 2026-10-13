@@ -189,7 +189,8 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 .statusline { font-size: 21px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .statusline .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--faint); flex: none; }
 .statusline.hunting .dot { background: var(--ok); } .statusline.paused .dot, .statusline.hold .dot { background: var(--warn); }
-.statusline.clicking .dot { background: var(--red); } .statusline.away .dot { background: var(--link); }
+.statusline.clicking .dot, .statusline.stopped .dot { background: var(--red); }
+#navMsg { font-variant-numeric: tabular-nums; } .statusline.away .dot { background: var(--link); }
 .tiles3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
 .tilew { background: var(--soft); border-radius: 12px; padding: 10px 12px; margin-top: 12px; }
 .tilew .k, .tiles3 .k { font-size: 13px; color: var(--muted); } .tilew .v { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
@@ -210,7 +211,6 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 <div class="head">
   <span class="name" id="title">Ticket hunter</span>
   <span class="pill wait" id="online"><span class="dot"></span><span id="onlineText">…</span></span>
-  <button class="lang" id="lang" type="button"></button>
 </div>
 
 <div id="scroller">
@@ -219,6 +219,7 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
   <label style="text-align:left;margin-top:22px"><span id="lPaste"></span><input type="text" id="paste" autocapitalize="off" autocomplete="off" autocorrect="off"></label>
   <div class="err hidden" id="ePaste" style="text-align:left"></div>
   <div class="btns"><button class="primary" id="pairBtn" type="button"></button></div>
+  <div class="seg" role="group" aria-label="Language" style="max-width:240px;margin:22px auto 0"><button type="button" id="upLangEn">English</button><button type="button" id="upLangHu">Magyar</button></div>
 </div>
 <div class="banner warn hidden" id="installTip" style="margin:12px 12px 0;border-radius:12px"></div>
 
@@ -348,6 +349,8 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
       <div class="sub" id="ver"></div>
       <div class="sub" id="updated"></div>
 
+      <label style="margin-top:14px" id="lLang"></label>
+      <div class="seg" role="group" aria-labelledby="lLang"><button type="button" id="langEn">English</button><button type="button" id="langHu">Magyar</button></div>
       <label style="margin-top:14px" id="lTheme"></label>
       <div class="seg" role="group" aria-labelledby="lTheme"><button type="button" id="thLight"></button><button type="button" id="thDark"></button><button type="button" id="thSystem"></button></div>
       <div class="btns"><button class="danger" id="unpair" type="button"></button></div>
@@ -379,13 +382,13 @@ body { padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
 (() => {
 'use strict';
 const DB_URL = 'https://remote-panel-c2375-default-rtdb.europe-west1.firebasedatabase.app';
-const PHONE_VERSION = '2.3.4';      // shown at the bottom, next to the computer's script version
+const PHONE_VERSION = '2.4.0';      // shown at the bottom, next to the computer's script version
 const ONLINE_MS = 40000;          // the computer reports at least every 15 s while this page is open
 
 // ================= texts =================
 const STR = {
   en: {
-    stHold: 'On hold', refreshLbl: 'Refresh', refreshEvery: 'every {a}–{b} s', refreshEach: 'every {a} s',
+    stHold: 'On hold', refreshLbl: 'Refresh', refreshEvery: '{a}–{b} s', refreshEach: '{a} s',
     fFail: 'Skip after (failed clicks)', fFailMin: 'for (minutes)',
     fFailHint: 'A ticket that keeps failing is skipped for a while. Two site error pages also skip it. 0 turns this off.',
     errFail: 'Enter 0 to 20', errFailMin: 'Enter 1 to 1440 minutes',
@@ -424,7 +427,7 @@ const STR = {
     offlineHint: 'The computer isn\'t reporting. Is it on, with an FC Bayern page open?',
   },
   hu: {
-    stHold: 'Várakoztatva', refreshLbl: 'Frissítés', refreshEvery: '{a}–{b} mp-enként', refreshEach: '{a} mp-enként',
+    stHold: 'Várakoztatva', refreshLbl: 'Frissítés', refreshEvery: '{a}–{b} mp', refreshEach: '{a} mp',
     fFail: 'Kihagyás ennyi sikertelen kattintás után', fFailMin: 'ennyi percre',
     fFailHint: 'Az újra és újra sikertelen jegyet egy időre kihagyja. Két oldalhiba szintén kihagyást okoz. 0 esetén kikapcsolva.',
     errFail: '0 és 20 között adj meg', errFailMin: '1 és 1440 perc között adj meg',
@@ -494,7 +497,7 @@ Object.assign(STR.en, {   // 2.3.0
   huntingMatch: 'Hunting {m}', huntingAny: 'Hunting', clickingNow: 'Clicking tickets…', startingNow: 'Starting…', pausedNow: 'Hunting is paused',
   limitLeft: '{n} more ticket(s) allowed', limitFull: 'Cart limit reached · not clicking more', hLatest: 'Latest', whatToHunt: 'What to hunt',
   seatLine: 'Block {b} · Row {r} · Seat {s}', catNames: ['', 'Kategorie 1', 'Kategorie 2', 'Kategorie 3', 'Kategorie 4', 'Standing', 'Lounge'],
-  theme: 'Appearance', thLight: 'Light', thDark: 'Dark', thSystem: 'System',
+  theme: 'Appearance', language: 'Language', stoppedNow: 'Stopped', thLight: 'Light', thDark: 'Dark', thSystem: 'System',
   dupWarn: 'This is the same as preset “{n}”. Save it anyway?', saveAnyway: 'Save anyway',
 });
 Object.assign(STR.en.errs, {
@@ -531,7 +534,7 @@ Object.assign(STR.hu, {   // 2.3.0
   huntingMatch: 'Keresés: {m}', huntingAny: 'Keresés', clickingNow: 'Kattintás a jegyekre…', startingNow: 'Indul…', pausedNow: 'A keresés szünetel',
   limitLeft: 'Még {n} jegy tehető a kosárba', limitFull: 'Kosárlimit elérve · nincs több kattintás', hLatest: 'Legutóbb', whatToHunt: 'Mit keres',
   seatLine: '{b}. szektor · {r}. sor · {s}. szék', catNames: ['', 'Kategorie 1', 'Kategorie 2', 'Kategorie 3', 'Kategorie 4', 'Állóhely', 'Páholy'],
-  theme: 'Megjelenés', thLight: 'Világos', thDark: 'Sötét', thSystem: 'Rendszer',
+  theme: 'Megjelenés', language: 'Nyelv', stoppedNow: 'Leállt', thLight: 'Világos', thDark: 'Sötét', thSystem: 'Rendszer',
   dupWarn: 'Ez ugyanaz, mint a(z) „{n}” előbeállítás. Mégis menti?', saveAnyway: 'Mentés mégis',
 });
 Object.assign(STR.hu.errs, {
@@ -717,7 +720,7 @@ const PIN = (on, c) => `<svg width="14" height="14" viewBox="0 0 24 24" fill="${
 
 function staticTexts() {
   document.documentElement.lang = lang;
-  $('lang').textContent = T.lang;
+  $('lLang').textContent = T.language;
   $('upTitle').textContent = T.upTitle; $('upText').textContent = T.upText;
   $('lPaste').textContent = T.paste; $('pairBtn').textContent = T.pairBtn; $('ePaste').textContent = T.badLink; $('installTip').textContent = T.installTip;
   $('match').setAttribute('aria-label', T.match);
@@ -781,6 +784,7 @@ function render() {
   $('unpaired').classList.toggle('hidden', paired);
   $('installTip').classList.toggle('hidden', !(paired && justPaired && !standalone));
   $('app').classList.toggle('hidden', !paired);
+  [['upLangEn', 'en'], ['upLangHu', 'hu']].forEach(([id, l]) => $(id).setAttribute('aria-pressed', String(lang === l)));
   $('tabbar').classList.toggle('hidden', !paired);
   const online = st && (Date.now() + offset - st.t) < ONLINE_MS;
   $('online').className = 'pill ' + (!st ? 'wait' : online ? 'on' : 'off');
@@ -797,12 +801,14 @@ function render() {
 
   // status
   const h = st.hunt;
-  const status = st.paused ? 'paused' : (st.hold ? 'hold' : h.status);
+  const blocked = !!(st.nav && st.nav.blocked);
+  const status = blocked ? 'stopped' : st.paused ? 'paused' : (st.hold ? 'hold' : h.status);
   $('state').className = 'statusline ' + status;
   const navText = (st.nav.msg || {})[lang] || '';
   const match = String(st.match.open || '').replace(/\s+/g, ' ').replace(/^FC Bayern München\s*[-–]\s*/i, '');
   let big, sub = '';
-  if (st.paused) { big = T.pausedNow; sub = st.page === 'tickets' ? T.pausedSub : navText; }
+  if (blocked) { big = T.stoppedNow; sub = navText; }
+  else if (st.paused) { big = T.pausedNow; sub = st.page === 'tickets' ? T.pausedSub : navText; }
   else if (st.hold) { big = T.stHold; sub = navText; }
   else if (st.page === 'tickets') { big = status === 'clicking' ? T.clickingNow : status === 'starting' ? T.startingNow : (match ? fmt(T.huntingMatch, { m: match }) : T.huntingAny); sub = huntSub(); }
   else { big = navText || T.stAway; }
@@ -860,6 +866,7 @@ function render() {
   $('latestCard').classList.toggle('hidden', !ev.length);
   $('latest').innerHTML = ev.length ? `<div class="ev"><time>${clock(ev[0].at - offset)}</time><span>${esc(ev[0][lang] || ev[0].en)}</span></div>` : '';
   ['Light', 'Dark', 'System'].forEach(k => $('th' + k).setAttribute('aria-pressed', String(theme() === k.toLowerCase())));
+  [['langEn', 'en'], ['langHu', 'hu']].forEach(([id, l]) => $(id).setAttribute('aria-pressed', String(lang === l)));
 
   if (view === 'presets' && !presetEdit) renderPresets();
 }
@@ -950,7 +957,7 @@ function huntSub() {
   return parts.join(' · ');
 }
 function tick() {
-  if (!st || st.page !== 'tickets' || st.paused || st.hold || ['clicking', 'starting'].includes(st.hunt.status)) return;
+  if (!st || st.page !== 'tickets' || st.paused || st.hold || (st.nav && st.nav.blocked) || ['clicking', 'starting'].includes(st.hunt.status)) return;
   if (Date.now() + offset - st.t < ONLINE_MS) $('navMsg').textContent = huntSub();
 }
 
@@ -1140,7 +1147,9 @@ function savePreset() {
 
 // ================= wiring =================
 function wire() {
-  $('lang').onclick = () => { lang = lang === 'en' ? 'hu' : 'en'; T = STR[lang]; localStorage.setItem('rp_lang', lang); staticTexts(); ['match', 'presetChips', 'accChips', 'presetBox'].forEach(id => { $(id).dataset.sig = ''; }); render(); };
+  const setLang = l => { if (l === lang) return; lang = l; T = STR[lang]; localStorage.setItem('rp_lang', lang); staticTexts(); ['match', 'presetChips', 'accChips', 'presetBox'].forEach(id => { $(id).dataset.sig = ''; }); render(); };
+  ['langEn', 'upLangEn'].forEach(id => { $(id).onclick = () => setLang('en'); });
+  ['langHu', 'upLangHu'].forEach(id => { $(id).onclick = () => setLang('hu'); });
   $('pairBtn').onclick = async () => {
     if (!takeKey($('paste').value)) { $('ePaste').classList.remove('hidden'); return; }
     $('paste').value = ''; await setup(); render(); listen(); fetchState(); hello();
